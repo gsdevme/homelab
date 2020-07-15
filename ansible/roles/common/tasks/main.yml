@@ -1,0 +1,76 @@
+-   name: install epel-release
+    when: ansible_distribution == 'CentOS'
+    package:
+        name:
+            - epel-release
+            - yum-cron
+            - yum-utils
+        state: latest
+
+-   name: install base packages
+    package:
+        name:
+            - ca-certificates
+        state: latest
+
+-   name: install common packages
+    become: yes
+    package:
+        name:
+            - deltarpm
+            - net-tools
+            - git
+            - avahi
+            - vim-enhanced
+            - ncdu
+            - hdparm
+            - mlocate
+            - htop
+            - logrotate
+            - chrony
+            - lm_sensors
+            - smartmontools
+            - screen
+            - zsh
+            - postfix
+        state: latest
+
+-   name: Disable SELinux
+    selinux:
+        state: disabled
+
+-   name: Stop service firewalld
+    service:
+        name: firewalld
+        state: stopped
+
+-   name: disable service firewalld
+    service:
+        name: firewalld
+        enabled: false
+
+-   name: enable service postfix
+    service:
+        name: postfix
+        enabled: true
+
+-   name: Template a file to /etc/postfix/sasl_passwd
+    template:
+        src: templates/sasl_passwd.j2
+        dest: /etc/postfix/sasl_passwd
+        owner: root
+        group: root
+        mode: '0600'
+    notify:
+        - restart postfix
+
+-   name: Template a file to /etc/yum/yum-cron.conf
+    when: ansible_distribution == 'CentOS'
+    template:
+        src: templates/yum-cron.j2
+        dest: /etc/yum/yum-cron.conf
+        owner: root
+        group: root
+        mode: '0600'
+    notify:
+        - restart yum-cron
