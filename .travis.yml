@@ -11,7 +11,7 @@ addons:
   apt:
     update: true
 script:
-  - chmod 600 ansible
+  - chmod 600 .ansible
   - sudo modprobe wireguard
   - sudo cp wg0.conf /etc/wireguard/wg0.conf
   - sudo systemctl start wg-quick@wg0.service
