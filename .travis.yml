@@ -15,4 +15,5 @@ script:
   - sudo cp wg0.conf /etc/wireguard/wg0.conf
   - sudo systemctl start wg-quick@wg0.service
   - ping -c 4 172.16.16.100
+  - ssh-keyscan -H 172.16.16.5 >> ~/.ssh/known_hosts
   - ssh -i .ansible root@172.16.16.5 "df -h"
