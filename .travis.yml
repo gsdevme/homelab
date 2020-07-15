@@ -21,4 +21,4 @@ script:
   - ssh -i .ansible root@172.16.16.5 "uptime"
   - cd ansible/
   - pip install ansible
-  - ansible-playbook -i hosts.yml site.yml  --vault-password-file ../ansible.password
+  - ansible-playbook -i hosts.yml site.yml --private-key ../.ansible --vault-password-file ../ansible.password
