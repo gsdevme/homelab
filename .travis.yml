@@ -1,0 +1,18 @@
+dist: focal
+language: generic
+before_install:
+  - sudo apt-get install software-properties-common -y
+  - sudo add-apt-repository ppa:wireguard/wireguard -y
+  - sudo apt-get -q update
+  - sudo apt-get install wireguard -y
+addons:
+  apt:
+    update: true
+script:
+#  - sudo modprobe wireguard
+#  - sudo cp .travis/wg0.conf /etc/wireguard/wg0.conf
+#  - sudo sed -i -e "s/PRIVATE_KEY/$WIREGUARD_PRIVATE_KEY/g" /etc/wireguard/wg0.conf
+#  - sudo sed -i -e "s/PUBLIC_KEY/$WIREGUARD_PUBLIC_KEY/g" /etc/wireguard/wg0.conf
+#  - sudo sed -i -e "s/ADDRESS/$WIREGUARD_ADDRESS/g" /etc/wireguard/wg0.conf
+#  - sudo systemctl start wg-quick@wg0.service
+#  - ping -c 4 172.16.16.100
