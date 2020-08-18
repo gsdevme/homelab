@@ -1,3 +1,5 @@
 nfs_exports:
-    - "/srv/nfs/pihole 172.16.16.0/24(fsid=1,rw,subtree_check,insecure,all_squash)"
-nfs_folders: ["homeassistant", "pihole"]
+    - "/srv/nfs/pihole 172.16.16.0/24(fsid=1,rw,no_subtree_check,insecure,no_root_squash)"
+    - "/srv/nfs/mqtt 172.16.16.0/24(fsid=2,rw,no_subtree_check,insecure,no_root_squash)"
+    - "/srv/nfs/homebridge 172.16.16.0/24(fsid=2,rw,no_subtree_check,insecure,no_root_squash)"
+nfs_folders: ["homeassistant", "pihole", "mqtt", "homebridge"]

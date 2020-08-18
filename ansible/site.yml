@@ -5,3 +5,8 @@
 - hosts: nfs.lan.gsdev.me
   roles:
       - role: nfs
+
+#- hosts: docker.lan.gsdev.me
+#  roles:
+#      - role: proxmox-guest
+#      - role: docker
