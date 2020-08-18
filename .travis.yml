@@ -12,6 +12,7 @@ addons:
   apt:
     update: true
 script:
+  - make build
   - chmod 600 .ansible
   - sudo modprobe wireguard
   - sudo cp wg0.conf /etc/wireguard/wg0.conf
