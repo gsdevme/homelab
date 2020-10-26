@@ -1,0 +1,84 @@
+esphome:
+  name: tempcontroller
+  platform: ESP32
+  board: nodemcu-32s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  ap:
+    ssid: "Fallback Hotspot"
+    password: !secret ap_wifi_password
+
+captive_portal:
+
+mqtt:
+  broker: 172.16.16.180
+  discovery: false
+  topic_prefix: 'esphome/tempcontroller'
+
+logger:
+  level: INFO
+#  level: DEBUG
+
+ota:
+
+web_server:
+  port: 80
+  auth:
+    username: admin
+    password: !secret web_server_password
+
+esp32_ble_tracker:
+
+#text_sensor:
+#  - platform: ble_scanner
+#    name: "BLE Devices Scanner"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: 180s
+  - platform: uptime
+    name: "Uptime Sensor"
+  # ATC_15E359
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:15:E3:59"
+    bindkey: "8f9e84d6f3b87fc00e0743b2ad819536" # NOT IMPORTANT, ITS BEEN FLASHED
+    temperature:
+      name: "Living Room Temperature"
+    humidity:
+      name: "Living Room Humidity"
+    battery_level:
+      name: "Living Room Battery Level"
+  # ATC_3ED9E6
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:3E:D9:E6"
+    bindkey: "8f9e84d6f3b87fc00e0743b2ad819536" # NOT IMPORTANT, ITS BEEN FLASHED
+    temperature:
+      name: "Master Bedroom Temperature"
+    humidity:
+      name: "Master Bedroom Humidity"
+    battery_level:
+      name: "Master Bedroom Battery Level"
+  # ATC_58447F
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:58:44:7F"
+    bindkey: "8f9e84d6f3b87fc00e0743b2ad819536" # NOT IMPORTANT, ITS BEEN FLASHED
+    temperature:
+      name: "LYWSD03MMC Temperature"
+    humidity:
+      name: "LYWSD03MMC Humidity"
+    battery_level:
+      name: "LYWSD03MMC Battery Level"
+  # ATC_34EF8F
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:34:EF:8F"
+    bindkey: "8f9e84d6f3b87fc00e0743b2ad819536" # NOT IMPORTANT, ITS BEEN FLASHED
+    temperature:
+      name: "Living Room 2 Temperature"
+    humidity:
+      name: "Living Room 2 Humidity"
+    battery_level:
+      name: "Living Room 2 Battery Level"
