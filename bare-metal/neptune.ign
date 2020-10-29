@@ -5,6 +5,13 @@
   "passwd": {
     "users": [
       {
+        "name": "core"
+      },
+      {
+        "groups": [
+          "sudo",
+          "wheel"
+        ],
         "name": "gavin",
         "sshAuthorizedKeys": [
           "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRrTZfJ80DbDBVd8gLyYO2TpZuVXDIsLWqZ/P5SRnmhNT8idl5oi3NQ8PkDu8enVvf8pS8oqGCJza+EMxqpR0ioRdtKbJQDHPNyW1cuPXzbNfyofF/jBZrKISOMQnwRvsYg9+0EbJ9CljALArTftRX9Z4OXt0rBOsM7kjjlUg5P6an0WvZQvqZx3e6dbgH6SD6fIdz32DCrEdLwfzQNHbSL8jHZL4czC0+JTNVBWjgfKZlm/tavXDhgI3agTmPcbWQ6Z7ljtjp7N/o8RPKhnWw1reYaIbB0Ei1kdf0yOk0lhMHcDeTQkm6XqVTIQogngNwk+rWitWBfSKD75sPJk0F /Users/gavin/.ssh/id_rsa",
