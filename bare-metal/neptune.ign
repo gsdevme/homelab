@@ -1,0 +1,16 @@
+{
+  "ignition": {
+    "version": "3.1.0"
+  },
+  "passwd": {
+    "users": [
+      {
+        "name": "gavin",
+        "sshAuthorizedKeys": [
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDRrTZfJ80DbDBVd8gLyYO2TpZuVXDIsLWqZ/P5SRnmhNT8idl5oi3NQ8PkDu8enVvf8pS8oqGCJza+EMxqpR0ioRdtKbJQDHPNyW1cuPXzbNfyofF/jBZrKISOMQnwRvsYg9+0EbJ9CljALArTftRX9Z4OXt0rBOsM7kjjlUg5P6an0WvZQvqZx3e6dbgH6SD6fIdz32DCrEdLwfzQNHbSL8jHZL4czC0+JTNVBWjgfKZlm/tavXDhgI3agTmPcbWQ6Z7ljtjp7N/o8RPKhnWw1reYaIbB0Ei1kdf0yOk0lhMHcDeTQkm6XqVTIQogngNwk+rWitWBfSKD75sPJk0F /Users/gavin/.ssh/id_rsa",
+          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDZnyf5O49iZaqTDG7/ScimJLvuL+pRKZTMrl7q1TC1OTyKL0rdZQozmaYUC2E4s8G7GlkfqlHrLPivHiBKZvAntb+QnAByDRzDwv+cX62RkqmMeYVgNvP+qHuAcaZgiU2WE1M0iIm7SRzOfay8Yc3EKSOIdMY7bOoCmSUeIedUE9f/+JI7CL6aNkCrIH1RAFElULlafQBPrkGKTT8cWrrbLLsea1sj+18+Phce0zfMlBanw+1kOmoG9hH3OBQrU1+i4gSdmNETC2EgZUQne4xJfvZpF0AnsrGODhkrvaotUWntMDensDgLV8pfVzCCZg98eWnxNLo9LA0WEG4egndkWrvXstVZKbs8VjFHCuktvDw2Z+Wi9n5SSz3EwvLBHfAJoR3VKfsm8Jz5v/W6BQ0V2S1DatzKxF/EVkSrucZOn8ZcjuKJPVOgWD6L2IudFkaf03IsA6JyUgwknBbdhSsgS0ophIl5NuLuEjSY0ZUCmZdNUY1VOYJqsnMnyqn379U= gavin@Gavins-MacBook-Pro-2.local"
+        ]
+      }
+    ]
+  }
+}
