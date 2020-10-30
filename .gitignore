@@ -1,0 +1,4 @@
+# Local versions of these to execute CI 'locally'
+ansible.password
+.ansible
+kube_config

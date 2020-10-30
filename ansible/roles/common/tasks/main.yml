@@ -1,10 +1,16 @@
+-   name: install yum-tools
+    when: (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7')
+    package:
+        name:
+            - yum-cron
+            - yum-utils
+        state: latest
+
 -   name: install epel-release
     when: ansible_distribution == 'CentOS'
     package:
         name:
             - epel-release
-            - yum-cron
-            - yum-utils
         state: latest
 
 -   name: install base packages
@@ -17,7 +23,6 @@
     become: yes
     package:
         name:
-            - deltarpm
             - net-tools
             - git
             - avahi
@@ -65,7 +70,7 @@
         - restart postfix
 
 -   name: Template a file to /etc/yum/yum-cron.conf
-    when: ansible_distribution == 'CentOS'
+    when: (ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7')
     template:
         src: templates/yum-cron.j2
         dest: /etc/yum/yum-cron.conf
