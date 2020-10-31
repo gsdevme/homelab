@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysite-nginx
+  namespace: helloworld
+  labels:
+    app: mysite-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysite-nginx
+  template:
+    metadata:
+      labels:
+        app: mysite-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginxdemos/hello
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: helloworld
+  name: svc-helloworld
+spec:
+  selector:
+    app: mysite-nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  namespace: helloworld
+  name: mysite-nginx-ingress
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    nginx.ingress.kubernetes.io/whitelist-source-range: '172.16.16.128/25'
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    #traefik.ingress.kubernetes.io/whitelist-source-range: '0.0.0.0/0'
+    #ingress.kubernetes.io/whitelist-x-forwarded-for: 'true'
+spec:
+  rules:
+    - host: helloworld.home.gsdev.me
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: svc-helloworld
+              servicePort: 80
+  tls:
+    - hosts:
+        - helloworld.home.gsdev.me
+      secretName: helloworld-home-gsdev-me-tls

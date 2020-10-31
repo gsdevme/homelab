@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-dnsmasq-lan
+  namespace: local-lan-dns
+spec:
+  selector:
+    app: dnsmasq-lan
+  ports:
+    - protocol: UDP
+      port: 53
+      targetPort: 53
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+      - ip: 172.16.16.10
