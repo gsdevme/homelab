@@ -29,6 +29,5 @@ script:
   # Avoid ssh-key prompt
   - ssh-keyscan -H 172.16.16.8 >> ~/.ssh/known_hosts
   - ssh-keyscan -H 172.16.16.9 >> ~/.ssh/known_hosts
-
   # Go
-  #- make ci
+  - make ci
