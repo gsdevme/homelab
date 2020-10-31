@@ -12,21 +12,23 @@ before_install:
 addons:
   apt:
     update: true
-script:
+
+before_script:
+  # Get ready for Ansible & K8s
+  - pip install ansible
+  - export KUBECONFIG=$(pwd)/kube_config
   # Connect to the VPN
   - chmod 600 .ansible
   - sudo modprobe wireguard
   - sudo cp wg0.conf /etc/wireguard/wg0.conf
+
+script:
+  # Start & Test we are on the LAN
   - sudo systemctl start wg-quick@wg0.service
-  # Test we are on the LAN
   - ping -c 4 172.16.16.100
   # Avoid ssh-key prompt
   - ssh-keyscan -H 172.16.16.8 >> ~/.ssh/known_hosts
   - ssh-keyscan -H 172.16.16.9 >> ~/.ssh/known_hosts
-  # Test the SSH key
-  - ssh -i .ansible root@172.16.16.8 "uptime"
-  - ssh -i .ansible root@172.16.16.9 "uptime"
-  # Get ready for Ansible & K8s
-  - pip install ansible
-  - export KUBECONFIG=$(pwd)/kube_config
-  - make ci
+
+  # Go
+  #- make ci
