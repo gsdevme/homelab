@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dnsmasq-lan
+  namespace: local-lan-dns
+  labels:
+    app: dnsmasq-lan
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dnsmasq-lan
+  template:
+    metadata:
+      labels:
+        app: dnsmasq-lan
+    spec:
+      containers:
+        - name: dnsmasq
+          image: gsdevme/lan_dns:latest
+          ports:
+            - containerPort: 53
+              name: dns-udp
+              protocol: UDP
