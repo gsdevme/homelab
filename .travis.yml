@@ -16,7 +16,7 @@ script:
   # Connect to the VPN
   - chmod 600 .ansible
   - sudo modprobe wireguard
-  - cp wg0.conf /etc/wireguard/wg0.conf
+  - sudo cp wg0.conf /etc/wireguard/wg0.conf
   - sudo systemctl start wg-quick@wg0.service
   # Test we are on the LAN
   - ping -c 4 172.16.16.100
