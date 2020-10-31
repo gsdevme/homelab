@@ -1,6 +1,7 @@
 dist: focal
 language: generic
 before_install:
+- sudo apt-get install wireguard
 - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.0/bin/linux/amd64/kubectl
 - chmod +x ./kubectl
 - sudo mv ./kubectl /usr/local/bin/kubectl
@@ -15,7 +16,7 @@ script:
   # Connect to the VPN
   - chmod 600 .ansible
   - sudo modprobe wireguard
-  - sudo mkdir -p /etc/wireguard/ && cp wg0.conf /etc/wireguard/wg0.conf
+  - cp wg0.conf /etc/wireguard/wg0.conf
   - sudo systemctl start wg-quick@wg0.service
   # Test we are on the LAN
   - ping -c 4 172.16.16.100
