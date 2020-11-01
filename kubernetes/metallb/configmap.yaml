@@ -10,3 +10,7 @@ data:
       protocol: layer2
       addresses:
       - 172.16.16.9-172.16.16.11
+    - name: lan-dns
+      protocol: layer2
+      addresses:
+      - 172.16.16.33-172.16.16.34
