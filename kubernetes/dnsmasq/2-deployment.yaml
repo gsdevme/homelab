@@ -22,7 +22,7 @@ spec:
           securityContext:
             capabilities:
               add: [ "NET_ADMIN" ]
-          image: gsdevme/lan_dns:debian-test
+          image: gsdevme/lan_dns:latest
           ports:
             - containerPort: 53
               name: dns-udp
