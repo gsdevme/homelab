@@ -1,9 +1,10 @@
 .PHONY: all
 default: all;
 
-build:
-	docker build . --file Dockerfile --tag gsdevme/lan_dns:latest
+tag=latest
 
+build:
+	docker build . --file Dockerfile --tag gsdevme/lan_dns:$(tag)
 
 push:
-	docker push gsdevme/lan_dns:latest
+	docker push gsdevme/lan_dns:$(tag)
