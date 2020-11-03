@@ -7,6 +7,8 @@ metadata:
     app: dnsmasq-lan
 spec:
   replicas: 1
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: dnsmasq-lan
@@ -17,7 +19,10 @@ spec:
     spec:
       containers:
         - name: dnsmasq
-          image: gsdevme/lan_dns:latest
+          securityContext:
+            capabilities:
+              add: [ "NET_ADMIN" ]
+          image: gsdevme/lan_dns:debian-test
           ports:
             - containerPort: 53
               name: dns-udp

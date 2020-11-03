@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: helloworld
+  name: helloworld-config
+data:
+  SCRIPT_FILENAME: "/app/public/index.php"
+  HTTP_PROXY: ""
