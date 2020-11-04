@@ -14,8 +14,7 @@ frontend:
 
 history:
 
-sensor:
-  !include_dir_merge_list sensors/
+sensor: !include_dir_merge_list sensors/
 
 tts:
   - platform: google_translate

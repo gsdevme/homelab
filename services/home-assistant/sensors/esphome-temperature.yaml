@@ -3,3 +3,8 @@
   name: "mqtt_xiaomi_atc_15e359_living_room"
   state_topic: "esphome/tempcontroller/sensor/living_room_temperature/state"
   unit_of_measurement: '°C'
+- platform: mqtt
+  unique_id: "mqtt_xiaomi_atc_34ef8f_living_room"
+  name: "mqtt_xiaomi_atc_34ef8f_living_room"
+  state_topic: "esphome/tempcontroller/sensor/living_room_2_temperature/state"
+  unit_of_measurement: '°C'

@@ -1,0 +1,5 @@
+- platform: min_max
+  name: 'Living Room Temperature'
+  entity_ids:
+    - sensor.mqtt_xiaomi_atc_34ef8f_living_room
+    - sensor.mqtt_xiaomi_atc_15e359_living_room
