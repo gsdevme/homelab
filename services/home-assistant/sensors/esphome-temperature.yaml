@@ -1,10 +1,42 @@
 - platform: mqtt
-  unique_id: "mqtt_xiaomi_atc_15e359_living_room"
-  name: "mqtt_xiaomi_atc_15e359_living_room"
+  unique_id: "mqtt_xiaomi_atc_15e359_living_room_temperature"
+  name: "mqtt_xiaomi_atc_15e359_living_room_temperature"
   state_topic: "esphome/tempcontroller/sensor/living_room_temperature/state"
   unit_of_measurement: '°C'
+  device_class: 'temperature'
+
 - platform: mqtt
-  unique_id: "mqtt_xiaomi_atc_34ef8f_living_room"
-  name: "mqtt_xiaomi_atc_34ef8f_living_room"
+  unique_id: "mqtt_xiaomi_atc_34ef8f_living_room_temperature"
+  name: "mqtt_xiaomi_atc_34ef8f_living_room_temperature"
   state_topic: "esphome/tempcontroller/sensor/living_room_2_temperature/state"
   unit_of_measurement: '°C'
+  device_class: 'temperature'
+
+- platform: mqtt
+  unique_id: "mqtt_xiaomi_atc_58447f_office_temperature"
+  name: "mqtt_xiaomi_atc_58447f_office_temperature"
+  state_topic: "esphome/tempcontroller/sensor/office_temperature/state"
+  unit_of_measurement: '°C'
+  device_class: 'temperature'
+
+- platform: mqtt
+  unique_id: "mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature"
+  name: "mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature"
+  state_topic: "esphome/tempcontroller/sensor/master_bedroom_temperature/state"
+  unit_of_measurement: '°C'
+  device_class: 'temperature'
+
+- platform: mqtt
+  unique_id: "mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature"
+  name: "mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature"
+  state_topic: "esphome/tempcontroller/sensor/bathroom_temperature/state"
+  unit_of_measurement: '°C'
+  device_class: 'temperature'
+
+- platform: mqtt
+  unique_id: "mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature"
+  name: "mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature"
+  state_topic: "esphome/tempcontroller/sensor/ensuite_temperature/state"
+  unit_of_measurement: '°C'
+  device_class: 'temperature'
+

@@ -1,0 +1,12 @@
+- platform: mqtt
+  unique_id: mqtt_guest_mode_switch
+  name: mqtt_guest_mode_switch
+  state_topic: "homeassistant/guest_mode/state"
+  command_topic: "homeassistant/guest_mode/state"
+  payload_on: "ON"
+  payload_off: "OFF"
+  state_on: "ON"
+  state_off: "OFF"
+  optimistic: false
+  qos: 0
+  retain: true

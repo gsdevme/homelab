@@ -1,0 +1,6 @@
+sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature:
+  friendly_name: Ensuite Temperature
+sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature:
+  friendly_name: Bathroom Temperature
+sensor.mqtt_xiaomi_atc_3ed9e6_living_room_temperature:
+  friendly_name: Master Bedroom Temperature
