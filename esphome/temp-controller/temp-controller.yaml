@@ -67,11 +67,11 @@ sensor:
     mac_address: "A4:C1:38:58:44:7F"
     bindkey: "8f9e84d6f3b87fc00e0743b2ad819536" # NOT IMPORTANT, ITS BEEN FLASHED
     temperature:
-      name: "LYWSD03MMC Temperature"
+      name: "Office Temperature"
     humidity:
-      name: "LYWSD03MMC Humidity"
+      name: "Office Humidity"
     battery_level:
-      name: "LYWSD03MMC Battery Level"
+      name: "Office Battery Level"
   # ATC_34EF8F
   - platform: xiaomi_lywsd03mmc
     mac_address: "A4:C1:38:34:EF:8F"
@@ -82,3 +82,23 @@ sensor:
       name: "Living Room 2 Humidity"
     battery_level:
       name: "Living Room 2 Battery Level"
+  # LYWSD03MMC
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:A5:FD:DE"
+    bindkey: "098dba87c9955ea876df1dbaa7b12957"
+    temperature:
+      name: "Bathroom Temperature"
+    humidity:
+      name: "Bathroom Humidity"
+    battery_level:
+      name: "Bathroom Battery Level"
+  # LYWSD03MMC
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:79:01:CE"
+    bindkey: "a020d2053ffe80efcf01a22efbe9c3d0"
+    temperature:
+      name: "Ensuite Temperature"
+    humidity:
+      name: "Ensuite Humidity"
+    battery_level:
+      name: "Ensuite Battery Level"
