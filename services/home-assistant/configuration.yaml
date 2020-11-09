@@ -3,14 +3,37 @@ homeassistant:
   unit_system: metric
   customize: !include customize.yaml
 
+http:
+  use_x_forwarded_for: true
+  login_attempts_threshold: 2
+  ip_ban_enabled: true
+  trusted_proxies:
+    - 172.16.16.0/24
+    - 10.0.0.0/8
+
 mqtt:
-  # TODO ADD DNS ENTRY AND USE ENV
-  broker: !env_var MQTT_HOST
+  broker: !env_var MQTT_HOST 127.0.0.1
 
 recorder:
   purge_keep_days: 3
 
 frontend:
+
+mobile_app:
+discovery:
+ios:
+
+plant:
+  kitchen_plant:
+    sensors:
+      moisture: sensor.mqtt_kitchen_plant_moisture
+      conductivity:  sensor.mqtt_kitchen_plant_conductivity
+      temperature:  sensor.mqtt_kitchen_plant_temperature
+    min_moisture: 20
+    max_moisture: 60
+    min_conductivity: 150
+    max_conductivity: 600
+    min_temperature: 10
 
 history:
 
@@ -18,8 +41,20 @@ sensor: !include_dir_merge_list sensors/
 binary_sensor: !include_dir_merge_list binary-sensors/
 switch: !include_dir_merge_list switches/
 
+#coinbase:
+#  api_key: !secret coinbase_api_key
+#  api_secret: !secret coinbase_api_secret
+
 #lovelace:
 #  mode: yaml
+
+alarm_control_panel:
+  - platform: manual
+    name: 'Alarm'
+    delay_time: 20
+    trigger_time: 1
+    disarmed:
+      trigger_time: 0
 
 tts:
   - platform: google_translate
@@ -33,3 +68,6 @@ person:
   - name: Gavin
     id: gavin
     user_id: 101
+  - name: Ceilidh
+    id: ceilidh
+    user_id: 102

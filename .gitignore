@@ -2,3 +2,6 @@
 ansible.password
 .ansible
 kube_config
+
+kubernetes/*/2-secrets.yaml
+services/*/*env

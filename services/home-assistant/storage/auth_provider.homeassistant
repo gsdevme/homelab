@@ -5,7 +5,11 @@
         "users": [
             {
                 "username": "gavin",
-                "password": "JDJiJDEyJDIxVkRuTWVnTGVHd25RZlBWTWVUS2VBSDNOaS9jdjlCUk5VUDVJcTd4cE1NcWxBSlppWGZh"
+                "password": "not_a_real_password"
+            },
+            {
+                "username": "ceilidh",
+                "password": "not_a_real_password"
             }
         ]
     }

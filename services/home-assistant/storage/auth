@@ -12,6 +12,16 @@
                 "is_active": true,
                 "name": "gavin",
                 "system_generated": false
+            },
+            {
+                "id": "102",
+                "group_ids": [
+                    "system-users"
+                ],
+                "is_owner": false,
+                "is_active": true,
+                "name": "ceilidh",
+                "system_generated": false
             }
         ],
         "groups": [
@@ -36,6 +46,15 @@
                 "auth_provider_id": null,
                 "data": {
                     "username": "gavin"
+                }
+            },
+            {
+                "id": "41c36d098a0545178f31d1695575bf29",
+                "user_id": "102",
+                "auth_provider_type": "homeassistant",
+                "auth_provider_id": null,
+                "data": {
+                    "username": "ceilidh"
                 }
             }
         ],

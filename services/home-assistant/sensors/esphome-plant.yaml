@@ -1,0 +1,12 @@
+- platform: mqtt
+  name: 'mqtt_kitchen_plant_moisture'
+  state_topic: "esphome/tempcontroller/sensor/kitchen_plant_moisture/state"
+  unit_of_measurement: '%'
+- platform: mqtt
+  name: 'mqtt_kitchen_plant_conductivity'
+  state_topic: "esphome/tempcontroller/sensor/kitchen_plant_soil_conductivity/state"
+  unit_of_measurement: 'µS/cm'
+- platform: mqtt
+  name: 'mqtt_kitchen_plant_temperature'
+  state_topic: "esphome/tempcontroller/sensor/kitchen_plant_temperature/state"
+  unit_of_measurement: '°C'
