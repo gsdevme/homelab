@@ -20,6 +20,13 @@
   device_class: 'temperature'
 
 - platform: mqtt
+  unique_id: "mqtt_xiaomi_hall_temperature"
+  name: "mqtt_xiaomi_hall_temperature"
+  state_topic: "esphome/tempcontroller/sensor/hall_temperature/state"
+  unit_of_measurement: '°C'
+  device_class: 'temperature'
+
+- platform: mqtt
   unique_id: "mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature"
   name: "mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature"
   state_topic: "esphome/tempcontroller/sensor/master_bedroom_temperature/state"

@@ -10,7 +10,7 @@ COPY *.yaml /config/
 COPY entrypoint.sh /bin/entrypoint.sh
 
 RUN chmod +x /bin/entrypoint.sh && \
-    apk --no-cache add apache2-utils
+    apk --no-cache add apache2-utils jq
 
 # Assert the configuration is ok before finalising the image
 RUN hass --script check_config -c /config/

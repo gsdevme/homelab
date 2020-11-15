@@ -1,11 +1,31 @@
 sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature:
-  friendly_name: Ensuite Temperature
+  friendly_name: Ensuite
+  icon: mdi:thermometer
 sensor.living_room_temperature:
   friendly_name: Living Room
+  icon: mdi:thermometer
+sensor.hall_temperature:
+  friendly_name: Hall
+  icon: mdi:thermometer
+sensor.kitchen_temperature:
+  friendly_name: Kitchen
+  icon: mdi:thermometer
+sensor.mqtt_xiaomi_atc_58447f_office_temperature:
+  friendly_name: Office
+  icon: mdi:thermometer
+sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature:
+  friendly_name: Master Bedroom
+  icon: mdi:thermometer
+sensor.rest_rack_temperature:
+  friendly_name: Rack
+  icon: mdi:thermometer
+#  icon: mdi:human-greeting
 sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature:
-  friendly_name: Bathroom Temperature
+  friendly_name: Bathroom
+  icon: mdi:thermometer
 sensor.mqtt_xiaomi_atc_3ed9e6_living_room_temperature:
-  friendly_name: Master Bedroom Temperature
+  friendly_name: Master Bedroom
+  icon: mdi:thermometer
 sensor.mqtt_kitchen_plant_moisture:
   friendly_name: Kitchen Plant Moisture
 binary_sensor.mqtt_guest_mode:

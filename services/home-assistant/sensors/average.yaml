@@ -4,3 +4,16 @@
   entity_ids:
     - sensor.mqtt_xiaomi_atc_34ef8f_living_room_temperature
     - sensor.mqtt_xiaomi_atc_15e359_living_room_temperature
+    - sensor.rest_living_room_temperature
+- platform: min_max
+  type: mean
+  name: 'Hall Temperature'
+  entity_ids:
+    - sensor.rest_hall_temperature
+    - sensor.mqtt_xiaomi_hall_temperature
+- platform: min_max
+  type: mean
+  name: 'Kitchen Temperature'
+  entity_ids:
+    - sensor.rest_kitchen_temperature
+    - sensor.rest_kitchen_rear_temperature

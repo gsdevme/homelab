@@ -2,10 +2,12 @@ homeassistant:
   name: Home
   unit_system: metric
   customize: !include customize.yaml
+  latitude: !env_var LATITUDE 0.0
+  longitude: !env_var LONGITUDE 0.0
 
 http:
   use_x_forwarded_for: true
-  login_attempts_threshold: 2
+  login_attempts_threshold: 3
   ip_ban_enabled: true
   trusted_proxies:
     - 172.16.16.0/24
@@ -22,31 +24,34 @@ frontend:
 mobile_app:
 discovery:
 ios:
+map:
+history:
+
+zone:
+  - name: Home
+    latitude: !env_var LATITUDE 0.0
+    longitude: !env_var LONGITUDE 0.0
+    radius: 90
+    icon: mdi:home
 
 plant:
   kitchen_plant:
     sensors:
       moisture: sensor.mqtt_kitchen_plant_moisture
-      conductivity:  sensor.mqtt_kitchen_plant_conductivity
-      temperature:  sensor.mqtt_kitchen_plant_temperature
+      conductivity: sensor.mqtt_kitchen_plant_conductivity
+      temperature: sensor.mqtt_kitchen_plant_temperature
     min_moisture: 20
     max_moisture: 60
     min_conductivity: 150
     max_conductivity: 600
     min_temperature: 10
 
-history:
-
 sensor: !include_dir_merge_list sensors/
 binary_sensor: !include_dir_merge_list binary-sensors/
 switch: !include_dir_merge_list switches/
 
-#coinbase:
-#  api_key: !secret coinbase_api_key
-#  api_secret: !secret coinbase_api_secret
-
-#lovelace:
-#  mode: yaml
+lovelace:
+  mode: yaml
 
 alarm_control_panel:
   - platform: manual
