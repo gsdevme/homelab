@@ -1,0 +1,8 @@
+namespace: metallb-system
+
+# kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+#
+# The secret will need to be manually created with the above
+
+resources:
+  - github.com/metallb/metallb//manifests?ref=v0.9.4
