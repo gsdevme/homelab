@@ -7,7 +7,7 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: main
+    branch: master
   secretRef:
     name: flux-system
   url: https://github.com/gsdevme/homelab.git
@@ -18,7 +18,7 @@ metadata:
   name: flux-system
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 10m0s
   path: ./kubernetes-cluster/test
   prune: true
   sourceRef:
