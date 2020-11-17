@@ -1,9 +1,12 @@
 # Prerequisites & Disaster Recovery
 
 ```
+# Install K3s (turn off SELinx, Firewalld etc on the host)
+# install on other hosts if multi node cluster
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --no-deploy traefik" sh
 
-# Grab kubectl from /etc/rancher/k3s/k3s.yaml
+# Grab kubectl from /etc/rancher/k3s/k3s.yaml and install Flux
+brew install flux
 
 # Bootstrap the cluster with gitops
 flux bootstrap github \
