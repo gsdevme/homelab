@@ -21,6 +21,11 @@ recorder:
 
 frontend:
 
+synology_dsm:
+  - host: 172.16.16.40
+    username: !env_var DSM_USERNAME home-assistant
+    password: !env_var DSM_PASSWORD home-assistant
+
 mobile_app:
 discovery:
 ios:
@@ -50,8 +55,12 @@ sensor: !include_dir_merge_list sensors/
 binary_sensor: !include_dir_merge_list binary-sensors/
 switch: !include_dir_merge_list switches/
 
-lovelace:
-  mode: yaml
+neato:
+  username: !env_var NEATO_USERNAME ""
+  password: !env_var NEATO_PASSWORD ""
+
+#lovelace:
+#  mode: yaml
 
 alarm_control_panel:
   - platform: manual

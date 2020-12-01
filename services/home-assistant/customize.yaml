@@ -26,8 +26,17 @@ sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature:
 sensor.mqtt_xiaomi_atc_3ed9e6_living_room_temperature:
   friendly_name: Master Bedroom
   icon: mdi:thermometer
+
+# TODO these names are overrriden, rename in the esphome also
 sensor.mqtt_kitchen_plant_moisture:
-  friendly_name: Kitchen Plant Moisture
+  friendly_name: Office Plant Moisture
+sensor.mqtt_kitchen_plant_conductivity:
+  friendly_name: Office Plant onductivity
+sensor.mqtt_kitchen_plant_temperature:
+  friendly_name: Office Plant Temperature
+plant.kitchen_plant:
+  friendly_name: Office Plant
+
 binary_sensor.mqtt_guest_mode:
   friendly_name: Guest Mode
 switch.mqtt_guest_mode_switch:
