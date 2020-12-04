@@ -1,5 +1,0 @@
-namespace: metallb-system
-
-resources:
-  - ../../common/metal-lb
-  - configmap.yaml
