@@ -22,7 +22,7 @@ spec:
           securityContext:
             capabilities:
               add: [ "NET_ADMIN" ]
-          image: gsdevme/lan_dns:4.1
+          image: gsdevme/lan_dns:4.2
           ports:
             - containerPort: 53
               name: dns-udp
