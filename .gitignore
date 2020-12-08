@@ -1,8 +1,9 @@
 # Local versions of these to execute CI 'locally'
 ansible.password
 .ansible
-kube_config
 
-kubernetes/*/2-secrets.yaml
+# Old Cluster
+kubernetes/
+
 kubernetes-cluster/*/*/secrets.yaml
 services/*/*env
