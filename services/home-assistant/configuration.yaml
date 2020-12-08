@@ -7,7 +7,7 @@ homeassistant:
 
 http:
   use_x_forwarded_for: true
-  login_attempts_threshold: 3
+  login_attempts_threshold: 10
   ip_ban_enabled: true
   trusted_proxies:
     - 172.16.16.0/24
@@ -22,7 +22,7 @@ recorder:
 frontend:
 
 synology_dsm:
-  - host: 172.16.16.40
+  - host: !env_var DSM_HOST 127.0.0.1
     username: !env_var DSM_USERNAME home-assistant
     password: !env_var DSM_PASSWORD home-assistant
 
@@ -31,6 +31,7 @@ discovery:
 ios:
 map:
 history:
+sun:
 
 zone:
   - name: Home
@@ -59,16 +60,18 @@ neato:
   username: !env_var NEATO_USERNAME ""
   password: !env_var NEATO_PASSWORD ""
 
-#lovelace:
-#  mode: yaml
+lovelace:
+  mode: yaml
 
 alarm_control_panel:
-  - platform: manual
-    name: 'Alarm'
-    delay_time: 20
-    trigger_time: 1
-    disarmed:
-      trigger_time: 0
+  - platform: mqtt
+    state_topic: "homeassistant/alarm/state"
+    command_topic: "homeassistant/alarm/state"
+    payload_disarm: "disarmed"
+    payload_arm_away: "armed_away"
+    payload_arm_home: "armed_home"
+    payload_arm_night: "armed_night"
+    retain: true
 
 tts:
   - platform: google_translate

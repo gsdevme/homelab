@@ -5,16 +5,16 @@ title: Home
 views:
   - path: default_view
     title: Home
-#    badges:
-#      - entity: binary_sensor.mqtt_guest_mode
-#      - entity: person.gavin
-#      - entity: person.ceilidh
-#      - entity: sensor.living_room_temperature
-#      - entity: sensor.hall_temperature
-#      - entity: sensor.kitchen_temperature
-#      - entity: sensor.rest_rack_temperature
-#      - entity: sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature
-#      - entity: sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature
+    #    badges:
+    #      - entity: binary_sensor.mqtt_guest_mode
+    #      - entity: person.gavin
+    #      - entity: person.ceilidh
+    #      - entity: sensor.living_room_temperature
+    #      - entity: sensor.hall_temperature
+    #      - entity: sensor.kitchen_temperature
+    #      - entity: sensor.rest_rack_temperature
+    #      - entity: sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature
+    #      - entity: sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature
     cards:
       - cards:
           - entity: sensor.living_room_temperature
@@ -44,7 +44,7 @@ views:
             hours_to_show: 6
             theme: Backend-selected
             type: sensor
-          - entity: sensor.rest_rack_temperature
+          - entity: sensor.mqtt_xiaomi_toilet_temperature
             graph: line
             hours_to_show: 6
             theme: Backend-selected
@@ -73,3 +73,69 @@ views:
         entities:
           - switch.mqtt_guest_mode_switch
         title: Switch
+      - type: alarm-panel
+        entity: alarm_control_panel.mqtt_alarm
+      - type: 'custom:vacuum-card'
+        entity: vacuum.jeff
+        stats:
+          default:
+            - attribute: filter_left
+              unit: hours
+              subtitle: Filter
+            - attribute: side_brush_left
+              unit: hours
+              subtitle: Side brush
+            - attribute: main_brush_left
+              unit: hours
+              subtitle: Main brush
+            - attribute: sensor_dirty_left
+              unit: hours
+              subtitle: Sensors
+          cleaning:
+            - attribute: cleaned_area
+              unit: m2
+              subtitle: Cleaning area
+            - attribute: cleaning_time
+              unit: minutes
+              subtitle: Cleaning time
+      - type: vertical-stack
+        title: Synology NAS
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.vault_cpu_load_5_min
+                min: 0
+                max: 400
+                severity:
+                  green: 100
+                  yellow: 275
+                  red: 375
+              - type: gauge
+                entity: sensor.vault_volume_1_volume_used
+                min: 0
+                max: 100
+                severity:
+                  green: 0
+                  yellow: 85
+                  red: 95
+          - type: horizontal-stack
+            cards:
+              - type: gauge
+                entity: sensor.vault_temperature
+                min: 0
+                max: 100
+                severity:
+                  green: 30
+                  yellow: 45
+                  red: 50
+              - type: gauge
+                entity: sensor.vault_volume_1_average_disk_temp
+                min: 0
+                max: 45
+                severity:
+                  green: 30
+                  yellow: 42
+                  red: 48
+
+

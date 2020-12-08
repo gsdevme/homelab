@@ -1,6 +1,9 @@
 sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature:
   friendly_name: Ensuite
   icon: mdi:thermometer
+sensor.mqtt_xiaomi_toilet_temperature:
+  friendly_name: Toilet
+  icon: mdi:thermometer
 sensor.living_room_temperature:
   friendly_name: Living Room
   icon: mdi:thermometer
@@ -36,6 +39,16 @@ sensor.mqtt_kitchen_plant_temperature:
   friendly_name: Office Plant Temperature
 plant.kitchen_plant:
   friendly_name: Office Plant
+
+
+sensor.vault_cpu_load_5_min:
+  friendly_name: CPU Load
+sensor.vault_volume_1_volume_used:
+  friendly_name: Disk Space Used
+sensor.vault_temperature:
+  friendly_name: CPU Temp
+sensor.vault_volume_1_average_disk_temp:
+  friendly_name: Disk Temp
 
 binary_sensor.mqtt_guest_mode:
   friendly_name: Guest Mode
