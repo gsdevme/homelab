@@ -4,4 +4,5 @@ ansible.password
 kube_config
 
 kubernetes/*/2-secrets.yaml
+kubernetes-cluster/*/*/secrets.yaml
 services/*/*env
