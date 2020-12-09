@@ -62,6 +62,9 @@ neato:
 
 lovelace:
   mode: yaml
+  resources:
+    - url: /local/vacuum-card.js
+      type: module
 
 alarm_control_panel:
   - platform: mqtt
