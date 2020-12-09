@@ -68,7 +68,7 @@ spec:
       containers:
         - name: home-assistant
           imagePullPolicy: Always
-          image: gsdevme/home-assistant:0.118.5-1
+          image: gsdevme/home-assistant:0.118.5-2
           env:
             - name: HOME_ASSISTANT_PASSWORD_GAVIN
               valueFrom:
@@ -90,6 +90,16 @@ spec:
                 secretKeyRef:
                   name: home-assistant-secrets
                   key: DSM_PASSWORD
+            - name: NEATO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-secrets
+                  key: NEATO_PASSWORD
+            - name: NEATO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-secrets
+                  key: NEATO_USERNAME
           ports:
             - containerPort: 8123
           volumeMounts:
