@@ -3,34 +3,34 @@
   value_template: '{{ value_json.state.temperature | float / 100 }}'
   unit_of_measurement: °C
   name: 'rest_hall_temperature'
-  scan_interval: 30
+  scan_interval: 90
 - platform: rest
   resource: http://172.16.16.75/api/ONBr4rlbegM2PSwlJ1suZi9HnH4aka9dX9OmvJDa/sensors/16
   value_template: '{{ value_json.state.temperature | float / 100 }}'
   unit_of_measurement: °C
-  scan_interval: 30
+  scan_interval: 90
   name: 'rest_kitchen_temperature'
 - platform: rest
   resource: http://172.16.16.75/api/ONBr4rlbegM2PSwlJ1suZi9HnH4aka9dX9OmvJDa/sensors/28
   value_template: '{{ value_json.state.temperature | float / 100 }}'
   unit_of_measurement: °C
-  scan_interval: 30
+  scan_interval: 90
   name: 'rest_frontdoor_temperature'
 - platform: rest
   resource: http://172.16.16.75/api/ONBr4rlbegM2PSwlJ1suZi9HnH4aka9dX9OmvJDa/sensors/48
   value_template: '{{ value_json.state.temperature | float / 100 }}'
   unit_of_measurement: °C
-  scan_interval: 30
+  scan_interval: 90
   name: 'rest_kitchen_rear_temperature'
 - platform: rest
   resource: http://172.16.16.75/api/ONBr4rlbegM2PSwlJ1suZi9HnH4aka9dX9OmvJDa/sensors/39
   value_template: '{{ value_json.state.temperature | float / 100 }}'
   unit_of_measurement: °C
-  scan_interval: 30
+  scan_interval: 90
   name: 'rest_rack_temperature'
 - platform: rest
   resource: http://172.16.16.75/api/ONBr4rlbegM2PSwlJ1suZi9HnH4aka9dX9OmvJDa/sensors/43
   value_template: '{{ value_json.state.temperature | float / 100 }}'
   unit_of_measurement: °C
-  scan_interval: 30
+  scan_interval: 90
   name: 'rest_living_room_temperature'
