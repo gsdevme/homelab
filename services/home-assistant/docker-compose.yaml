@@ -1,0 +1,14 @@
+version: '2.4'
+
+services:
+  ha:
+    image: home-assistant:dev
+    env_file:
+      - .env
+    build:
+      context: .
+    volumes:
+      - ./configuration.yaml:/config/configuration.yaml
+      - ./ui-lovelace.yaml:/config/ui-lovelace.yaml
+    ports:
+      - 8123:8123
