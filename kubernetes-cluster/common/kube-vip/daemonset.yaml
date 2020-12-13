@@ -32,8 +32,8 @@ spec:
               value: "3"
             - name: vip_retryperiod
               value: "1"
-          image: plndr/kube-vip:0.2.0
-          imagePullPolicy: Always
+          image: plndr/kube-vip:0.2.3
+          imagePullPolicy: IfNotPresent
           name: kube-vip
           resources: {}
           securityContext:
