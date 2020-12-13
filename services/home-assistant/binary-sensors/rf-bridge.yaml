@@ -10,7 +10,7 @@
   name: "mqtt_backdoor"
   state_topic: "tele/sonoff/RESULT"
   value_template: '{{value_json.RfReceived.Data}}'
-  payload_on: "2CDA0E"
-  payload_off: "2CDA0A"
+  payload_on: "2CDA0A"
+  payload_off: "2CDA0E"
   device_class: Door
   qos: 1
