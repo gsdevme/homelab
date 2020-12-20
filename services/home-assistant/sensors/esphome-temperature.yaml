@@ -54,3 +54,10 @@
   unit_of_measurement: '°C'
   device_class: 'temperature'
 
+- platform: mqtt
+  unique_id: "mqtt_xiaomi_loft_temperature"
+  name: "mqtt_xiaomi_loft_temperature"
+  state_topic: "esphome/tempcontroller/sensor/loft_temperature/state"
+  unit_of_measurement: '°C'
+  device_class: 'temperature'
+

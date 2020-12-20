@@ -2,16 +2,6 @@ title: Home
 views:
   - path: default_view
     title: Home
-    #    badges:
-    #      - entity: binary_sensor.mqtt_guest_mode
-    #      - entity: person.gavin
-    #      - entity: person.ceilidh
-    #      - entity: sensor.living_room_temperature
-    #      - entity: sensor.hall_temperature
-    #      - entity: sensor.kitchen_temperature
-    #      - entity: sensor.rest_rack_temperature
-    #      - entity: sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature
-    #      - entity: sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature
     cards:
       - cards:
           - entity: sensor.living_room_temperature
@@ -64,6 +54,46 @@ views:
             theme: Backend-selected
             type: sensor
         type: horizontal-stack
+      - cards:
+          - entity: sensor.mqtt_xiaomi_loft_temperature
+            graph: line
+            hours_to_show: 6
+            theme: Backend-selected
+            type: sensor
+          - entity: sensor.mqtt_xiaomi_loft_room_humidity
+            graph: line
+            hours_to_show: 6
+            theme: Backend-selected
+            type: sensor
+#          - entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
+#            graph: line
+#            hours_to_show: 6
+#            theme: Backend-selected
+#            type: sensor
+#          - entity: sensor.rest_rack_temperature
+#            graph: line
+#            hours_to_show: 6
+#            theme: Backend-selected
+#            type: sensor
+        type: horizontal-stack
+      - type: custom:auto-entities
+        card:
+          type: entities
+        filter:
+          include:
+            - entity_id: "*_humidity"
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+          title: Batteries
+        sort:
+          numeric: true
+        filter:
+          include:
+            - domain: sensor
+              attributes:
+                device_class: battery
       - type: plant-status
         entity: plant.kitchen_plant
       - type: entities
@@ -79,20 +109,10 @@ views:
         entity: alarm_control_panel.mqtt_alarm
       - type: 'custom:vacuum-card'
         entity: vacuum.jeff
+        compact_view: true
+        #map:  camera.jeff_cleaning_map
+        #map_refresh: 120
         stats:
-          default:
-            - attribute: filter_left
-              unit: hours
-              subtitle: Filter
-            - attribute: side_brush_left
-              unit: hours
-              subtitle: Side brush
-            - attribute: main_brush_left
-              unit: hours
-              subtitle: Main brush
-            - attribute: sensor_dirty_left
-              unit: hours
-              subtitle: Sensors
           cleaning:
             - attribute: cleaned_area
               unit: m2

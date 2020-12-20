@@ -8,6 +8,8 @@ services:
     build:
       context: .
     volumes:
+      - ./sensors:/config/sensors
+      - ./customize.yaml:/config/customize.yaml
       - ./configuration.yaml:/config/configuration.yaml
       - ./ui-lovelace.yaml:/config/ui-lovelace.yaml
     ports:

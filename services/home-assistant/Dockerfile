@@ -19,7 +19,8 @@ RUN chmod +x /bin/entrypoint.sh && \
 
 
 RUN cd /config/www/ && \
-    wget https://github.com/denysdovhan/vacuum-card/releases/download/v1.12.0/vacuum-card.js
+    wget https://github.com/denysdovhan/vacuum-card/releases/download/v1.12.0/vacuum-card.js && \
+    wget https://raw.githubusercontent.com/thomasloven/lovelace-auto-entities/master/auto-entities.js
 
 # Assert the configuration is ok before finalising the image
 RUN hass --script check_config -c /config/

@@ -16,20 +16,20 @@ http:
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1
 
-recorder:
-  purge_keep_days: 14
-  include:
-    domains:
-      - sensor
-      - switch
-      - media_player
-      - person
-      - vacuum
-      - binary_sensor
-      - plant
-      - camera
-      - sun
-  db_url: !env_var RECORDER_DSN sqlite:////config/home-assistant.sqlite
+#recorder:
+#  purge_keep_days: 14
+#  include:
+#    domains:
+#      - sensor
+#      - switch
+#      - media_player
+#      - person
+#      - vacuum
+#      - binary_sensor
+#      - plant
+#      - camera
+#      - sun
+#  db_url: !env_var RECORDER_DSN sqlite:////config/home-assistant.sqlite
 
 frontend:
 
@@ -76,6 +76,8 @@ lovelace:
   mode: yaml
   resources:
     - url: /local/vacuum-card.js
+      type: module
+    - url: /local/auto-entities.js
       type: module
 
 alarm_control_panel:
