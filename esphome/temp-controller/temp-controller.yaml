@@ -14,7 +14,7 @@ wifi:
 captive_portal:
 
 mqtt:
-  broker: 172.16.16.180
+  broker: mqtt.home.gsdev.me
   discovery: false
   topic_prefix: 'esphome/tempcontroller'
 
@@ -79,11 +79,11 @@ sensor:
     mac_address: "A4:C1:38:58:44:7F"
     bindkey: "8f9e84d6f3b87fc00e0743b2ad819536" # NOT IMPORTANT, ITS BEEN FLASHED
     temperature:
-      name: "Office Temperature"
+      name: "Toilet Temperature"
     humidity:
-      name: "Office Humidity"
+      name: "Toilet Humidity"
     battery_level:
-      name: "Office Battery Level"
+      name: "Toilet Battery Level"
   # ATC_34EF8F
   - platform: xiaomi_lywsd03mmc
     mac_address: "A4:C1:38:34:EF:8F"
@@ -123,3 +123,22 @@ sensor:
       name: "Hall Humidity"
     battery_level:
       name: "Hall Battery Level"
+  # MJ_HT_V1
+  - platform: xiaomi_lywsdcgq
+    mac_address: "58:2D:34:3B:8E:16"
+    temperature:
+      name: "Office Temperature"
+    humidity:
+      name: "Office Humidity"
+    battery_level:
+      name: "Office Battery Level"
+  # LYWSD03MMC
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:C4:84:F2"
+    bindkey: "4551e1cdc36da979a549acd0f057955b"
+    temperature:
+      name: "Loft Temperature"
+    humidity:
+      name: "Loft Humidity"
+    battery_level:
+      name: "Loft Battery Level"
