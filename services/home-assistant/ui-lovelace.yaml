@@ -14,7 +14,6 @@ views:
             hours_to_show: 6
             theme: Backend-selected
             type: sensor
-
         type: horizontal-stack
       - cards:
           - entity: sensor.hall_temperature
@@ -77,6 +76,9 @@ views:
         filter:
           include:
             - entity_id: "*_humidity"
+          exclude:
+            - state: unknown
+            - state: '< 60'
       - type: custom:auto-entities
         show_empty: false
         card:
@@ -89,6 +91,15 @@ views:
             - domain: sensor
               attributes:
                 device_class: battery
+          exclude:
+            - state: unknown
+            - state: '> 50'
+      - type: custom:auto-entities
+        card:
+          type: weather-forecast
+        filter:
+          include:
+            - domain: "weather"
       - type: plant-status
         entity: plant.kitchen_plant
       - type: entities
