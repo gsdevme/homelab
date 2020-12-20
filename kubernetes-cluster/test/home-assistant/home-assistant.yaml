@@ -100,6 +100,11 @@ spec:
                 secretKeyRef:
                   name: home-assistant-secrets
                   key: NEATO_USERNAME
+            - name: RECORDER_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-secrets
+                  key: RECORDER_DSN
           ports:
             - containerPort: 8123
           volumeMounts:
