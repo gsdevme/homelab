@@ -1,0 +1,11 @@
+# Home Assistant broke this and pushed everything to the GUI
+# instead :sad_face:
+#- platform: metoffice
+#  api_key: !env_var MET_OFFICE ""
+#  monitored_conditions:
+#    - weather
+#    - temperature
+#    - feels_like_temperature
+#    - uv
+#    - precipitation
+#    - humidity
