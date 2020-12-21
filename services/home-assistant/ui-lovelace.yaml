@@ -3,73 +3,69 @@ views:
   - path: default_view
     title: Home
     cards:
-      - cards:
-          - entity: sensor.living_room_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-          - entity: sensor.kitchen_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-        type: horizontal-stack
-      - cards:
-          - entity: sensor.hall_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-          - entity: sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-        type: horizontal-stack
-      - cards:
-          - entity: sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-          - entity: sensor.mqtt_xiaomi_toilet_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-        type: horizontal-stack
-      - cards:
-          - entity: sensor.mqtt_xiaomi_atc_58447f_office_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-        type: horizontal-stack
-      - cards:
-          - entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-          - entity: sensor.rest_rack_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-        type: horizontal-stack
-      - cards:
-          - entity: sensor.mqtt_xiaomi_loft_temperature
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-          - entity: sensor.mqtt_xiaomi_loft_room_humidity
-            graph: line
-            hours_to_show: 6
-            theme: Backend-selected
-            type: sensor
-        type: horizontal-stack
+      - type: grid
+        columns: 2
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: sensor
+                entity: sensor.living_room_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.kitchen_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.living_room_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_loft_room_humidity
+                graph: line
+                hours_to_show: 6
+          - type: vertical-stack
+            cards:
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_toilet_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_atc_58447f_office_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
+                graph: line
+                hours_to_show: 6
+              - type: sensor
+                entity: sensor.mqtt_xiaomi_loft_temperature
+                graph: line
+                hours_to_show: 6
+      - type: glance
+        entities:
+          - entity: binary_sensor.mqtt_backdoor
+          - entity: binary_sensor.mqtt_frontdoor
+        state_color: true
+      - type: glance
+        entities:
+          - alarm_control_panel.automated_alarm_panel
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: glance
+          state_color: true
+        filter:
+          include:
+            - domain: person
       - type: custom:auto-entities
         card:
           type: entities
@@ -94,30 +90,18 @@ views:
           exclude:
             - state: unknown
             - state: '> 50'
-      - type: custom:auto-entities
-        card:
-          type: weather-forecast
-        filter:
-          include:
-            - domain: "weather"
       - type: plant-status
         entity: plant.kitchen_plant
-      - type: entities
-        entities:
-          - switch.mqtt_guest_mode_switch
-        title: Switch
-      - type: glance
-        entities:
-          - entity: binary_sensor.mqtt_backdoor
-          - entity: binary_sensor.mqtt_frontdoor
-        state_color: true
-      - type: alarm-panel
-        entity: alarm_control_panel.mqtt_alarm
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+        filter:
+          include:
+            - domain: switch
       - type: 'custom:vacuum-card'
         entity: vacuum.jeff
         compact_view: true
-        #map:  camera.jeff_cleaning_map
-        #map_refresh: 120
         stats:
           cleaning:
             - attribute: cleaned_area

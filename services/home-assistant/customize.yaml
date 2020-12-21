@@ -55,10 +55,16 @@ sensor.mqtt_xiaomi_loft_temperature:
 sensor.mqtt_xiaomi_loft_room_humidity:
   friendly_name: Loft
 
+sensor.mqtt_xiaomi_ensuite_humidity:
+  friendly_name: Ensuite
+
 binary_sensor.mqtt_backdoor:
   friendly_name: Backdoor
 binary_sensor.mqtt_frontdoor:
   friendly_name: Frontdoor
+
+alarm_control_panel.automated_alarm_panel:
+  friendly_name: Security Alarm
 
 binary_sensor.mqtt_guest_mode:
   friendly_name: Guest Mode
