@@ -1,3 +1,12 @@
-#trigger:
-#  platform: template
-#  value_template: "{% if is_state('sun.sun', 'below_horizon') %}true{% endif %}"
+- alias: 'Set gavin not_home when not home'
+  trigger:
+    - platform: zone
+      event: leave
+      zone: zone.home
+      entity_id: device_tracker.iphone_x
+  action:
+    - service: mqtt.publish
+      data:
+        topic: homeassistant/person_tracker/location/gavin
+        payload: not_home
+        retain: true
