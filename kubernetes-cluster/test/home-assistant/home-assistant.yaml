@@ -75,6 +75,11 @@ spec:
                 secretKeyRef:
                   name: home-assistant-secrets
                   key: HOME_ASSISTANT_PASSWORD_GAVIN
+            - name: HOME_ASSISTANT_PASSWORD_CEILIDH
+              valueFrom:
+                secretKeyRef:
+                  name: home-assistant-secrets
+                  key: HOME_ASSISTANT_PASSWORD_CEILIDH
             - name: LATITUDE
               valueFrom:
                 secretKeyRef:
