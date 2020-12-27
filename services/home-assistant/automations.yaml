@@ -10,3 +10,15 @@
         topic: homeassistant/person_tracker/location/gavin
         payload: not_home
         retain: true
+- alias: 'Set gavin home when home'
+  trigger:
+    - platform: zone
+      event: enter
+      zone: zone.home
+      entity_id: device_tracker.iphone_x
+  action:
+    - service: mqtt.publish
+      data:
+        topic: homeassistant/person_tracker/location/gavin
+        payload: home
+        retain: true
