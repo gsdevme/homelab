@@ -9,6 +9,7 @@ if [ ! -f /config/.storage/onboarding ]; then
 fi
 
 hass --script auth -c /config change_password gavin $HOME_ASSISTANT_PASSWORD_GAVIN
+hass --script auth -c /config change_password ceilidh HOME_ASSISTANT_PASSWORD_CEILIDH
 
 hass --script check_config -c /config/
 
