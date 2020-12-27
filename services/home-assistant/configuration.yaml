@@ -129,18 +129,18 @@ scene: !include scenes.yaml
 device_tracker:
   - platform: mqtt
     devices:
-      gavin_phone: 'homeassistant/person_tracker/location/gavin'
-      ceilidh_phone: 'homeassistant/person_tracker/location/ceilidh'
+      gavin_phone_via_mqtt: 'homeassistant/person_tracker/location/gavin'
+      ceilidh_phone_via_mqtt: 'homeassistant/person_tracker/location/ceilidh'
     qos: 1
 
 person:
   - name: Gavin
     id: gavin
     device_trackers:
-      - device_tracker.gavin_phone
+      - device_tracker.gavin_phone_via_mqtt
     user_id: 101
   - name: Ceilidh
     id: ceilidh
     user_id: 102
     device_trackers:
-      - device_tracker.ceilidh_phone
+      - device_tracker.ceilidh_phone_via_mqtt
