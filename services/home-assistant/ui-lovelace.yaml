@@ -54,6 +54,7 @@ views:
         entities:
           - entity: binary_sensor.mqtt_backdoor
           - entity: binary_sensor.mqtt_frontdoor
+          - entity: binary_sensor.mqtt_office_window
         state_color: true
       - type: glance
         entities:
