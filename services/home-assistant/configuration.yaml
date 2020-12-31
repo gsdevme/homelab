@@ -23,6 +23,7 @@ recorder:
       - sensor
       - switch
       - media_player
+      - alarm_control_panel
       - person
       - vacuum
       - binary_sensor
@@ -79,6 +80,8 @@ lovelace:
     - url: /local/vacuum-card.js
       type: module
     - url: /local/auto-entities.js
+      type: module
+    - url: /local/layout-card.js
       type: module
 
 alarm_control_panel:
