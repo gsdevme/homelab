@@ -18,12 +18,9 @@ spec:
       containers:
         - name: php
           imagePullPolicy: Always
-          env:
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: wedding-secrets
-                  key: SENTRY_DSN
+          envFrom:
+            - secretRef:
+                name: wedding-secrets
           securityContext:
             # www-data
             runAsUser: 33
