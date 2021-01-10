@@ -33,6 +33,10 @@ views:
                     graph: line
                     hours_to_show: 6
                   - type: sensor
+                    entity: sensor.rest_rack_temperature
+                    graph: line
+                    hours_to_show: 6
+                  - type: sensor
                     entity: sensor.mqtt_xiaomi_loft_room_humidity
                     graph: line
                     hours_to_show: 6
@@ -51,7 +55,11 @@ views:
                     graph: line
                     hours_to_show: 6
                   - type: sensor
-                    entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
+                    entity: sensor.hall_temperature
+                    graph: line
+                    hours_to_show: 6
+                  - type: sensor
+                    entity: sensor.mqtt_xiaomi_loft_temperature
                     graph: line
                     hours_to_show: 6
           - break
