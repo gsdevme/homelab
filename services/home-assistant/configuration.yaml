@@ -70,9 +70,9 @@ sensor: !include_dir_merge_list sensors/
 binary_sensor: !include_dir_merge_list binary-sensors/
 switch: !include_dir_merge_list switches/
 
-neato:
-  username: !env_var NEATO_USERNAME ""
-  password: !env_var NEATO_PASSWORD ""
+#neato:
+#  username: !env_var NEATO_USERNAME ""
+#  password: !env_var NEATO_PASSWORD ""
 
 lovelace:
   mode: yaml

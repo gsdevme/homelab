@@ -68,7 +68,7 @@ spec:
       containers:
         - name: home-assistant
           imagePullPolicy: Always
-          image: gsdevme/home-assistant:2020.12.2-5
+          image: gsdevme/home-assistant:2021.1.3-1
           env:
             - name: HOME_ASSISTANT_PASSWORD_GAVIN
               valueFrom:
