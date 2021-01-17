@@ -28,9 +28,3 @@
   unit_of_measurement: °C
   scan_interval: 300
   name: 'rest_rack_temperature'
-- platform: rest
-  resource: http://172.16.16.75/api/ONBr4rlbegM2PSwlJ1suZi9HnH4aka9dX9OmvJDa/sensors/43
-  value_template: '{{ value_json.state.temperature | float / 100 }}'
-  unit_of_measurement: °C
-  scan_interval: 300
-  name: 'rest_living_room_temperature'
