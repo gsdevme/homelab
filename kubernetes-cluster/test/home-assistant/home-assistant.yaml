@@ -41,6 +41,9 @@ spec:
   ports:
     - port: 80
       targetPort: 8123
+    - port: 8300
+      targetPort: 8300
+      nodePort: 30007
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -112,6 +115,7 @@ spec:
                   key: RECORDER_DSN
           ports:
             - containerPort: 8123
+            - containerPort: 8300
           volumeMounts:
             - name: home-assistant-persistent-storage
               mountPath: "/config/.storage"
