@@ -48,6 +48,7 @@ metadata:
   name: svc-home-assistant-emulated-hue
   namespace: home-assistant
 spec:
+  type: NodePort
   selector:
     app: home-assistant
   ports:
