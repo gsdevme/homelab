@@ -94,6 +94,7 @@ emulated_hue:
   entities:
     switch.mqtt_guest_mode_switch:
       name: "Guest Mode"
+      hidden: false
 
 alarm_control_panel:
   # The manual Alarm
