@@ -1,4 +1,4 @@
 namespace: longhorn-system
 
 resources:
-  - github.com/longhorn/longhorn//deploy/longhorn.yaml?ref=v1.1.0
+  - https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
