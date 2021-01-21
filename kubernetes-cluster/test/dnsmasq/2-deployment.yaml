@@ -28,7 +28,7 @@ spec:
           securityContext:
             capabilities:
               add: [ "NET_ADMIN" ]
-          image: gsdevme/lan_dns:4.4
+          image: gsdevme/lan_dns:5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 53
