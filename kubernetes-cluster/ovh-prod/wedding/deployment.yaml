@@ -6,7 +6,7 @@ metadata:
   labels:
     app: wedding
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: wedding
@@ -15,6 +15,23 @@ spec:
       labels:
         app: wedding
     spec:
+#      initContainers:
+#        - name: dbmigrate
+#          imagePullPolicy: Always
+#          command:
+#            - php
+#          args:
+#            - bin/console
+#            - doctrine:migrations:m
+#            - -n
+#          envFrom:
+#            - secretRef:
+#                name: wedding-secrets
+#          securityContext:
+#            # www-data
+#            runAsUser: 33
+#            allowPrivilegeEscalation: false
+#          image: gsdevme/wedding-website:prod
       containers:
         - name: php
           imagePullPolicy: Always
