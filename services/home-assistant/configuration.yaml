@@ -17,7 +17,12 @@ api:
 
 alexa:
   smart_home:
-
+    filter:
+      include_entities:
+        - switch.mqtt_guest_mode_switch
+    entity_config:
+      switch.mqtt_guest_mode_switch:
+        name: "Guest Mode"
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1
 
@@ -88,18 +93,6 @@ lovelace:
       type: module
     - url: /local/layout-card.js
       type: module
-
-emulated_hue:
-  #host_ip: 192.168.1.186
-  listen_port: 8300
-  # hue-lb VM
-  advertise_ip: 10.10.40.30
-  advertise_port: 80
-  expose_by_default: false
-  entities:
-    switch.mqtt_guest_mode_switch:
-      name: "Guest Mode"
-      hidden: false
 
 alarm_control_panel:
   # The manual Alarm
