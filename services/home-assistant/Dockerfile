@@ -1,4 +1,4 @@
-ARG HOME_ASSISTANT_VERSION=latest
+ARG HOME_ASSISTANT_VERSION=stable
 
 FROM homeassistant/home-assistant:$HOME_ASSISTANT_VERSION
 

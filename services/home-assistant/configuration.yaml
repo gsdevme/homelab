@@ -13,6 +13,11 @@ http:
     - 172.16.16.0/24
     - 10.0.0.0/8
 
+api:
+
+alexa:
+  smart_home:
+
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1
 
