@@ -69,7 +69,7 @@ spec:
       containers:
         - name: home-assistant
           imagePullPolicy: Always
-          image: gsdevme/home-assistant:2021.1.5-2
+          image: gsdevme/home-assistant:2021.1.5-4
           envFrom:
             - secretRef:
                 name: home-assistant-secrets
