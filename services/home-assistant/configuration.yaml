@@ -17,12 +17,14 @@ api:
 
 alexa:
   smart_home:
+    locale: en-GB
     filter:
       include_entities:
         - switch.mqtt_guest_mode_switch
     entity_config:
       switch.mqtt_guest_mode_switch:
         name: "Guest Mode"
+
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1
 
@@ -80,9 +82,9 @@ sensor: !include_dir_merge_list sensors/
 binary_sensor: !include_dir_merge_list binary-sensors/
 switch: !include_dir_merge_list switches/
 
-#neato:
-#  username: !env_var NEATO_USERNAME ""
-#  password: !env_var NEATO_PASSWORD ""
+neato:
+  client_id: !env_var NEATO_CLIENT_ID ""
+  client_secret: !env_var NEATO_CLIENT_SECRET ""
 
 lovelace:
   mode: yaml
