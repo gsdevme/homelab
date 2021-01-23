@@ -66,6 +66,7 @@ metadata:
     app: home-assistant
 spec:
   replicas: 1
+  revisionHistoryLimit: 3
   strategy:
     type: Recreate
   selector:
