@@ -42,21 +42,6 @@ spec:
     - port: 80
       targetPort: 8123
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: svc-home-assistant-emulated-hue
-  namespace: home-assistant
-spec:
-  type: NodePort
-  selector:
-    app: home-assistant
-  ports:
-    - port: 8300
-      targetPort: 8300
-      name: api
-      nodePort: 30007
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -84,14 +69,12 @@ spec:
       containers:
         - name: home-assistant
           imagePullPolicy: Always
-          image: gsdevme/home-assistant:2021.1.5-1
+          image: gsdevme/home-assistant:2021.1.5-2
           envFrom:
             - secretRef:
                 name: home-assistant-secrets
           ports:
             - containerPort: 8123
-              protocol: TCP
-            - containerPort: 8300
               protocol: TCP
           volumeMounts:
             - name: home-assistant-persistent-storage
