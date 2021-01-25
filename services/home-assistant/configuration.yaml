@@ -21,9 +21,12 @@ alexa:
     filter:
       include_entities:
         - switch.mqtt_guest_mode_switch
+        - vacuum.jeff
     entity_config:
       switch.mqtt_guest_mode_switch:
         name: "Guest Mode"
+      vacuum.jeff:
+        name: "Jeff"
 
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1
