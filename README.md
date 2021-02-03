@@ -5,6 +5,9 @@
 # install on other hosts if multi node cluster
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --no-deploy traefik" sh
 
+# WITH MYSQL
+#curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --no-deploy traefik --datastore-endpoint=mysql://username:password@tcp(127.0.0.1:3306)/kubernetes" sh
+
 # Grab kubectl from /etc/rancher/k3s/k3s.yaml and install Flux
 brew install flux
 
