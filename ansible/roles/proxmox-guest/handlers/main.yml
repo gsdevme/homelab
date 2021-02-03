@@ -1,9 +1,0 @@
-- name: restart qemu-guest-agent
-  service:
-      name: qemu-guest-agent
-      state: restarted
-
-- name: enable qemu-guest-agent
-  service:
-      name: qemu-guest-agent
-      state: started
