@@ -1,8 +1,0 @@
--   name: install agent
-    package:
-        name:
-            - qemu-guest-agent
-        state: latest
-    notify:
-        - enable qemu-guest-agent
-        - restart qemu-guest-agent

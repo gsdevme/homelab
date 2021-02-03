@@ -1,9 +1,0 @@
-- name: restart postfix
-  service:
-      name: postfix
-      state: restarted
-
-- name: restart yum-cron
-  service:
-      name: yum-cron
-      state: restarted
