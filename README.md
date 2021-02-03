@@ -1,4 +1,9 @@
+# Homelab Monorepo
+
+[![Build Status](https://travis-ci.com/gsdevme/homelab.svg?branch=master)](https://travis-ci.com/gsdevme/homelab)
+
 # Prerequisites & Disaster Recovery
+
 
 ```
 # Install K3s (turn off SELinx, Firewalld etc on the host)

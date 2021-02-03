@@ -21,4 +21,4 @@ before_script:
   - docker version
 
 script:
-  - make home-assistant
+  - bash monorepo.sh
