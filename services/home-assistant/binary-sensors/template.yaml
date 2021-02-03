@@ -5,10 +5,13 @@
         {{ is_state('device_tracker.gavin_phone_via_mqtt', 'home')
            or is_state('device_tracker.ceilidh_phone_via_mqtt', 'home')
            or is_state('binary_sensor.mqtt_guest_mode', 'on') }}
-#- platform: template
-#  sensors:
-#    motion_at_home:
-#      value_template: >-
-#        {{ is_state('device_tracker.gavin_phone', 'home')
-#           or is_state('device_tracker.ceilidh_phone', 'home')
-#           or is_state('binary_sensor.mqtt_guest_mode', 'on') }}
+    all_lights_off:
+      value_template: >-
+        {{ states['light'] | count == states['light'] | selectattr('off','eq', state) | list | count }}
+    is_gavin_asleep:
+      value_template: >-
+        {{ now().hour > 21
+          and now().hour < 8
+          and is_state('all_lights_off', 'on') }}
+          and is_state('device_tracker.gavin_phone_via_mqtt', 'home')
+          and is_state('sensor.iphone_x_battery_state', 'Charging') }}

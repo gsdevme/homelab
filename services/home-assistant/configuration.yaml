@@ -15,6 +15,24 @@ http:
 
 api:
 
+input_datetime:
+  blue_bin:
+    name: Blue Bin
+    has_date: true
+    has_time: false
+  green_bin:
+    name: Green Bin
+    has_date: true
+    has_time: false
+  purple_bin:
+    name: Purple Bin
+    has_date: true
+    has_time: false
+  brown_bin:
+    name: Brown Bin
+    has_date: true
+    has_time: false
+
 alexa:
   smart_home:
     locale: en-GB
@@ -27,6 +45,11 @@ alexa:
         name: "Guest Mode"
       vacuum.jeff:
         name: "Jeff"
+
+logger:
+  default: info
+  logs:
+    homeassistant.components.alexa: debug
 
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1

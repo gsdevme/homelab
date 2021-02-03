@@ -9,6 +9,7 @@ services:
       context: .
     volumes:
       - ./sensors:/config/sensors
+      - ./automations.yaml:/config/automations.yaml
       - ./customize.yaml:/config/customize.yaml
       - ./configuration.yaml:/config/configuration.yaml
       - ./ui-lovelace.yaml:/config/ui-lovelace.yaml

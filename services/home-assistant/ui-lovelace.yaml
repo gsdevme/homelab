@@ -113,48 +113,24 @@ views:
                 - attribute: cleaning_time
                   unit: minutes
                   subtitle: Cleaning time
-          - type: vertical-stack
-            title: Synology NAS
-            cards:
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.vault_cpu_load_5_min
-                    min: 0
-                    max: 400
-                    severity:
-                      green: 100
-                      yellow: 275
-                      red: 375
-                  - type: gauge
-                    entity: sensor.vault_volume_1_volume_used
-                    min: 0
-                    max: 100
-                    severity:
-                      green: 0
-                      yellow: 85
-                      red: 95
-              - type: horizontal-stack
-                cards:
-                  - type: gauge
-                    entity: sensor.vault_temperature
-                    min: 0
-                    max: 100
-                    severity:
-                      green: 30
-                      yellow: 45
-                      red: 50
-                  - type: gauge
-                    entity: sensor.vault_volume_1_average_disk_temp
-                    min: 0
-                    max: 45
-                    severity:
-                      green: 30
-                      yellow: 42
-                      red: 48
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: entities
+              title: 'Bin Schedule'
+            filter:
+              include:
+                - domain: input_datetime
   - path: debug
     title: Debug
     cards:
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+        filter:
+          include:
+            - domain: binary_sensor
       - type: custom:auto-entities
         show_empty: false
         card:
@@ -174,3 +150,42 @@ views:
             - domain: sensor
               attributes:
                 device_class: battery
+#      - type: vertical-stack
+#          title: Synology NAS
+#          cards:
+#            - type: horizontal-stack
+#              cards:
+#                - type: gauge
+#                  entity: sensor.vault_cpu_load_5_min
+#                  min: 0
+#                  max: 400
+#                  severity:
+#                    green: 100
+#                    yellow: 275
+#                    red: 375
+#                - type: gauge
+#                  entity: sensor.vault_volume_1_volume_used
+#                  min: 0
+#                  max: 100
+#                  severity:
+#                    green: 0
+#                    yellow: 85
+#                    red: 95
+#            - type: horizontal-stack
+#              cards:
+#                - type: gauge
+#                  entity: sensor.vault_temperature
+#                  min: 0
+#                  max: 100
+#                  severity:
+#                    green: 30
+#                    yellow: 45
+#                    red: 50
+#                - type: gauge
+#                  entity: sensor.vault_volume_1_average_disk_temp
+#                  min: 0
+#                  max: 45
+#                  severity:
+#                    green: 30
+#                    yellow: 42
+#                    red: 48
