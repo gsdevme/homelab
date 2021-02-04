@@ -4,6 +4,8 @@ metadata:
   name: glasgow-bin-collection-cron
 spec:
   schedule: "0 7 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       template:
