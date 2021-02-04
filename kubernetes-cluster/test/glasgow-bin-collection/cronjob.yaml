@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: glasgow-bin-collection-cron
+spec:
+  schedule: "0 7 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: glasgow-bin-collection
+              image: gsdevme/glasgow-bin-collection-mqtt:1.0.0
+              imagePullPolicy: IfNotPresent
+              envFrom:
+                - configMapRef:
+                    name: glasgow-bin-config
+          restartPolicy: OnFailure

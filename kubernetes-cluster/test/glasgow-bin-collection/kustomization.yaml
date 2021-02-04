@@ -1,0 +1,6 @@
+namespace: bin-collection
+
+resources:
+  - namespace.yaml
+  - config.yaml
+  - cronjob.yaml
