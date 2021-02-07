@@ -94,6 +94,20 @@ spec:
     - host: ceilidhandgavin.com
       http:
         paths:
+          - path: /robots.txt
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-wedding
+                port:
+                  number: 80
+          - path: /favicon.ico
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-wedding
+                port:
+                  number: 80
           - path: /
             pathType: Prefix
             backend:
