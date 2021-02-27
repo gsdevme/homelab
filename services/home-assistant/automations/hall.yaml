@@ -30,7 +30,7 @@
     - condition: time
       before: '04:00:00'
     - condition: state
-      entity_id: light.hall_lights
+      entity_id: light.hall_light
       state: 'off'
   action:
     service: light.turn_on

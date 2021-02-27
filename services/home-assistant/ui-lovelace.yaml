@@ -27,7 +27,7 @@ views:
                     graph: line
                     hours_to_show: 6
                   - type: sensor
-                    entity: sensor.rest_rack_temperature
+                    entity: sensor.rack_sensor_temperature
                     graph: line
                     hours_to_show: 6
                   - type: sensor

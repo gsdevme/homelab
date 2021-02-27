@@ -8,11 +8,11 @@
   type: mean
   name: 'Hall Temperature'
   entity_ids:
-    - sensor.rest_hall_temperature
+    - sensor.hall_sensor_temperature
     - sensor.mqtt_xiaomi_hall_temperature
 - platform: min_max
   type: mean
   name: 'Kitchen Temperature'
   entity_ids:
-    - sensor.rest_kitchen_temperature
-    - sensor.rest_kitchen_rear_temperature
+    - sensor.kitchen_front_sensor_temperature
+    - sensor.kitchen_rear_sensor_temperature

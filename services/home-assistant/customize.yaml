@@ -19,9 +19,6 @@ sensor.mqtt_xiaomi_atc_58447f_office_temperature:
 sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature:
   friendly_name: Master Bedroom
   icon: mdi:thermometer
-sensor.rest_rack_temperature:
-  friendly_name: Rack
-  icon: mdi:thermometer
 #  icon: mdi:human-greeting
 sensor.mqtt_xiaomi_a4_c1_38_a5_fd_de_bathroom_temperature:
   friendly_name: Bathroom
