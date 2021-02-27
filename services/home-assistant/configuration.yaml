@@ -123,41 +123,20 @@ lovelace:
       type: module
 
 alarm_control_panel:
-  # The manual Alarm
-  - platform: mqtt
-    code_arm_required: false
-    state_topic: "homeassistant/alarm/state"
-    command_topic: "homeassistant/alarm/state"
-    payload_disarm: "disarmed"
-    payload_arm_away: "armed_away"
-    payload_arm_home: "armed_home"
-    payload_arm_night: "armed_night"
-    retain: true
- # The automated Alarm
   - platform: template
     panels:
       #
-      # 1. if the manual alarm is armed then arm
       # 2. if someone is home dont set
       # 3. default set the alarm
       #
       automated_alarm_panel:
         code_arm_required: false
         value_template: >-
-          {% if is_state('alarm_control_panel.mqtt_alarm', 'armed_away') %}
-            armed_away
-          {% elif is_state('alarm_control_panel.mqtt_alarm', 'armed_home') %}
-            armed_home
-          {% elif is_state('binary_sensor.people_home', 'on') %}
+          {% if is_state('binary_sensor.people_home', 'on') %}
             disarmed
           {% else %}
             armed_away
           {% endif %}
-        # Disarm the manual alarm also
-        disarm:
-          service: alarm_control_panel.alarm_arm_home
-          data:
-            entity_id: alarm_control_panel.mqtt_alarm
 
 tts:
   - platform: google_translate
@@ -167,21 +146,14 @@ automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
 
-device_tracker:
-  - platform: mqtt
-    devices:
-      gavin_phone_via_mqtt: 'homeassistant/person_tracker/location/gavin'
-      ceilidh_phone_via_mqtt: 'homeassistant/person_tracker/location/ceilidh'
-    qos: 1
-
 person:
   - name: Gavin
     id: gavin
     device_trackers:
-      - device_tracker.gavin_phone_via_mqtt
+      - device_tracker.iphone_x
     user_id: 101
   - name: Ceilidh
     id: ceilidh
     user_id: 102
-    device_trackers:
-      - device_tracker.ceilidh_phone_via_mqtt
+#    device_trackers:
+#      - device_tracker.ceilidh_phone_via_mqtt
