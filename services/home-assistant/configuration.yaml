@@ -38,8 +38,8 @@ alexa:
     locale: en-GB
     filter:
       include_entities:
-        - lights.master_bedroom_light
-        - lights.all_lights
+        - light.master_bedroom_light
+        - light.all_lights
         - switch.mqtt_guest_mode_switch
         - vacuum.jeff
     entity_config:
@@ -47,9 +47,9 @@ alexa:
         name: "Guest Mode"
       vacuum.jeff:
         name: "Jeff"
-      lights.all_lights:
+      light.all_lights:
         name: "Everything"
-      lights.master_bedroom_light:
+      light.master_bedroom_light:
         name: "Master Bedroom Light"
 
 logger:
