@@ -38,6 +38,8 @@ alexa:
     locale: en-GB
     filter:
       include_entities:
+        - lights.master_bedroom_light
+        - lights.all_lights
         - switch.mqtt_guest_mode_switch
         - vacuum.jeff
     entity_config:
@@ -45,6 +47,10 @@ alexa:
         name: "Guest Mode"
       vacuum.jeff:
         name: "Jeff"
+      lights.all_lights:
+        name: "Everything"
+      lights.master_bedroom_light:
+        name: "Master Bedroom Light"
 
 logger:
   default: info
@@ -53,6 +59,7 @@ logger:
 
 mqtt:
   broker: !env_var MQTT_HOST 127.0.0.1
+  discovery: true
 
 recorder:
   purge_keep_days: 14
@@ -142,9 +149,59 @@ tts:
   - platform: google_translate
 
 group: !include groups.yaml
-automation: !include automations.yaml
+automation: !include_dir_merge_list automations/
 script: !include scripts.yaml
 scene: !include scenes.yaml
+
+light:
+  - platform: group
+    name: hall_lights
+    entities:
+      - light.hall_light
+      - light.landing_light
+  - platform: group
+    name: all_living_room_lights
+    entities:
+      - light.living_room_lamp
+      - light.living_room_playbar
+      - light.living_room_light
+      - light.living_room_light_strip
+  - platform: group
+    name: living_room_lights
+    entities:
+      - light.living_room_lamp
+      - light.living_room_playbar
+      - light.living_room_light_strip
+  - platform: group
+    name: kitchen_lights
+    entities:
+      - light.kitchen_front_light
+      - light.kitchen_rear_light
+  - platform: group
+    name: downstairs_lights
+    entities:
+      - light.hall_light
+      - light.all_living_room_lights
+      - light.living_room_lights
+      - light.downstairs_cupboard_light
+      - light.outside_light
+  - platform: group
+    name: upstairs_lights
+    entities:
+      - light.master_bedroom_light
+      - light.office_light
+      - light.landing_light
+      - light.spare_bedroom_light
+      - light.upstairs_cupboard
+  - platform: group
+    name: all_lights
+    entities:
+      - light.upstairs_lights
+      - light.downstairs_lights
+
+timer:
+  kitchen:
+    duration: "00:05:00"
 
 person:
   - name: Gavin

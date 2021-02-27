@@ -2,13 +2,14 @@ ARG HOME_ASSISTANT_VERSION=stable
 
 FROM homeassistant/home-assistant:$HOME_ASSISTANT_VERSION
 
-ENV MQTT_HOST=mqtt.home.gsdev.me
+ENV MQTT_HOST=zigbee2mqtt.home.gsdev.me
 ENV DSM_HOST=nas.home.gsdev.me
 ENV TZ=London/Europe
 
 COPY sensors/*.yaml /config/sensors/
 COPY binary-sensors/*.yaml /config/binary-sensors/
 COPY switches/*.yaml /config/switches/
+COPY automations/*.yaml /config/automations/
 COPY storage/* /config/bootstrap/
 COPY *.yaml /config/
 COPY entrypoint.sh /bin/entrypoint.sh

@@ -1,0 +1,106 @@
+- alias: 'Turn on kitchen light when pressed on'
+  trigger:
+    platform: state
+    entity_id: sensor.kitchen_switch_action
+    to: 'on-press'
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.kitchen_lights
+      data:
+        brightness: 254
+        color_temp: 200
+        transition: 1
+    # Light strip cannot go over 200 as it will use more than 10 watts
+    # @todo buy the 30 watt version once Covid-19 is over and you can visit IKEA
+    - service: light.turn_on
+      target:
+        entity_id: light.kitchen_light_strip
+      data:
+        brightness: 190
+        transition: 1
+
+- alias: 'Turn off kitchen light when pressed off'
+  trigger:
+    platform: state
+    entity_id: sensor.kitchen_switch_action
+    to: 'off-press'
+  action:
+    - service: light.turn_off
+      target:
+        entity_id: light.kitchen_lights
+    - service: light.turn_off
+      target:
+        entity_id: light.kitchen_light_strip
+
+- alias: 'Turn on kitchen light when there is movement before 11pm'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_motion
+    to: 'on'
+  condition:
+    - condition: time
+      before: '23:00:00'
+    - condition: state
+      entity_id: light.kitchen_lights
+      state: 'off'
+  action:
+    - service: light.turn_on
+      target:
+        entity_id: light.kitchen_lights
+      data:
+        brightness: 254
+        color_temp: 200
+        transition: 1
+    # Light strip cannot go over 200 as it will use more than 10 watts
+    # @todo buy the 30 watt version once Covid-19 is over and you can visit IKEA
+    - service: light.turn_on
+      target:
+        entity_id: light.kitchen_light_strip
+      data:
+        brightness: 190
+        transition: 1
+
+- alias: 'Turn on kitchen light when there is movement after 11pm'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.kitchen_motion
+    to: 'on'
+  condition:
+    - condition: time
+      after: '23:00:00'
+    - condition: state
+      entity_id: light.kitchen_lights
+      state: 'off'
+  action:
+    service: light.turn_on
+    target:
+      entity_id: light.kitchen_lights
+    data:
+      brightness: 30
+
+- alias: 'Start/Restart timer if motion OR switch pressed in the kitchen'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.kitchen_motion
+      to: 'on'
+    - platform: state
+      entity_id: light.kitchen_lights
+      to: 'on'
+  action:
+    service: timer.start
+    target:
+      entity_id: timer.kitchen
+
+- alias: "Turn off kitchen lights after timer finishes"
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.kitchen
+  action:
+    service: light.turn_off
+    target:
+      entity_id:
+        - light.kitchen_lights
+        - light.kitchen_light_strip

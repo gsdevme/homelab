@@ -1,0 +1,9 @@
+- platform: rest
+  resource: https://ceilidhandgavin.com/api/healthz
+  name: 'wedding_website_health'
+  method: GET
+  #device_class: 'connectivity'
+  json_attributes_path: "$.success"
+  scan_interval: 120
+  value_template: 'ok'
+

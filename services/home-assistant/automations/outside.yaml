@@ -1,0 +1,30 @@
+- alias: 'Turn on outside light when there is movement and no light'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.outside_sensor_occupancy
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: light.outside_light
+      state: 'off'
+    - condition: numeric_state
+      entity_id: sensor.outside_sensor_illuminance_lux
+      below: 80
+  action:
+    service: light.turn_on
+    target:
+      entity_id: light.outside_light
+    data:
+      brightness: 254
+
+- alias: 'Turn off outside light 3 minutes after last movement'
+  trigger:
+    platform: state
+    entity_id: light.outside_light
+    to: 'off'
+    for:
+      minutes: 3
+  action:
+    service: light.turn_off
+    target:
+      entity_id: light.outside_light

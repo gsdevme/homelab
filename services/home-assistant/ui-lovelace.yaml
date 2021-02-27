@@ -81,7 +81,7 @@ views:
                     device_class: battery
               exclude:
                 - state: unknown
-                - state: '> 50'
+                - state: '> 75'
           - type: custom:auto-entities
             show_empty: false
             card:
@@ -130,6 +130,13 @@ views:
           type: entities
         filter:
           include:
+            - domain: light
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+        filter:
+          include:
             - domain: binary_sensor
       - type: custom:auto-entities
         show_empty: false
@@ -137,7 +144,21 @@ views:
           type: entities
         filter:
           include:
+            - domain: sensor
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+        filter:
+          include:
             - domain: switch
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
+        filter:
+          include:
+            - domain: timer
       - type: custom:auto-entities
         show_empty: false
         card:
