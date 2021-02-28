@@ -73,11 +73,19 @@
       entity_id: light.kitchen_lights
       state: 'off'
   action:
-    service: light.turn_on
-    target:
-      entity_id: light.kitchen_lights
-    data:
-      brightness: 30
+    - service: light.turn_on
+      target:
+        entity_id: light.kitchen_lights
+      data:
+        brightness: 60
+    # Light strip cannot go over 200 as it will use more than 10 watts
+    # @todo buy the 30 watt version once Covid-19 is over and you can visit IKEA
+    - service: light.turn_on
+      target:
+        entity_id: light.kitchen_light_strip
+      data:
+        brightness: 190
+        transition: 1
 
 - alias: 'Start/Restart timer if motion OR switch pressed in the kitchen'
   trigger:
