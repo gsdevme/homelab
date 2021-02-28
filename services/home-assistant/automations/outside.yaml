@@ -17,13 +17,13 @@
     data:
       brightness: 254
 
-- alias: 'Turn off outside light 3 minutes after last movement'
+- alias: 'Turn off outside light 2 minutes after last movement'
   trigger:
     platform: state
     entity_id: light.outside_light
     to: 'off'
     for:
-      minutes: 3
+      minutes: 2
   action:
     service: light.turn_off
     target:
