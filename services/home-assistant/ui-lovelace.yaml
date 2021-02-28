@@ -84,6 +84,7 @@ views:
               exclude:
                 - state: unknown
                 - state: unavailable
+                - state: Not Charging
                 - state: '> 20'
           - type: custom:auto-entities
             show_empty: false
