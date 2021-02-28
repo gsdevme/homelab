@@ -67,7 +67,6 @@ recorder:
     domains:
       - sensor
       - switch
-      - media_player
       - alarm_control_panel
       - person
       - vacuum
@@ -75,6 +74,7 @@ recorder:
       - plant
       - camera
       - sun
+      - timer
   db_url: !env_var RECORDER_DSN sqlite:////config/home-assistant.sqlite
 
 weather:
@@ -91,6 +91,7 @@ ios:
 map:
 history:
 sun:
+logbook:
 
 zone:
   - name: Home
