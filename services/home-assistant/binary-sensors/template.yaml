@@ -12,7 +12,7 @@
         {{ is_state('sensor.iphone_x_battery_state', 'Charging') }}
     all_lights_off:
       value_template: >
-        {{ states['light'] | count == states['light'] | selectattr('off','eq', state) | list | count }}
+        {{ is_state('light.all_lights', 'off') }}
     is_gavin_asleep:
       value_template: >-
         {{ now().hour > 20
