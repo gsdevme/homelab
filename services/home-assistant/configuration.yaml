@@ -139,7 +139,9 @@ alarm_control_panel:
       automated_alarm_panel:
         code_arm_required: false
         value_template: >-
-          {% if is_state('binary_sensor.people_home', 'on') %}
+          {% if is_state('switch.mqtt_force_alarm_switch', 'on') %}
+            armed_away
+          {% elif is_state('binary_sensor.people_home', 'on') %}
             disarmed
           {% else %}
             armed_away
