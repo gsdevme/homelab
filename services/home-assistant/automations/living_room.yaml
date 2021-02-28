@@ -9,6 +9,7 @@
       entity_id: light.living_room_lights
     data:
       brightness: 180
+      xy_color: [0.472, 0.413]
 
 - alias: 'Turn off living room light when pressed off'
   trigger:
