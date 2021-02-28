@@ -10,7 +10,7 @@ views:
         max_columns: 3
         cards:
           - type: grid
-            columns: 2
+            columns: 3
             cards:
               - type: vertical-stack
                 cards:
@@ -30,10 +30,6 @@ views:
                     entity: sensor.rack_sensor_temperature
                     graph: line
                     hours_to_show: 6
-                  - type: sensor
-                    entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
-                    graph: line
-                    hours_to_show: 6
               - type: vertical-stack
                 cards:
                   - type: sensor
@@ -48,12 +44,18 @@ views:
                     entity: sensor.mqtt_xiaomi_atc_58447f_office_temperature
                     graph: line
                     hours_to_show: 6
+              - type: vertical-stack
+                cards:
                   - type: sensor
                     entity: sensor.hall_temperature
                     graph: line
                     hours_to_show: 6
                   - type: sensor
                     entity: sensor.mqtt_xiaomi_loft_temperature
+                    graph: line
+                    hours_to_show: 6
+                  - type: sensor
+                    entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
                     graph: line
                     hours_to_show: 6
           - break
@@ -81,7 +83,8 @@ views:
                     device_class: battery
               exclude:
                 - state: unknown
-                - state: '> 75'
+                - state: unavailable
+                - state: '> 20'
           - type: custom:auto-entities
             show_empty: false
             card:
@@ -98,7 +101,7 @@ views:
                 - entity_id: "*_humidity"
               exclude:
                 - state: unknown
-                - state: '< 60'
+                - state: '< 65'
           - break
           - type: plant-status
             entity: plant.kitchen_plant
