@@ -20,6 +20,11 @@
           and is_state('binary_sensor.all_lights_off', 'on')
           and is_state('person.gavin', 'home')
           and is_state('sensor.phone_is_charging', 'on') }}
+    motion_inside:
+      value_template: >-
+        {{ is_state('binary_sensor.hall_or_landing_motion', 'on')
+          or is_state('binary_sensor.kitchen_motion', 'on')
+          or is_state('binary_sensor.hall_sensor_occupancy', 'on') }}
     hall_or_landing_motion:
       value_template: >-
         {{ is_state('binary_sensor.landing_sensor_bookcase_occupancy', 'on')
