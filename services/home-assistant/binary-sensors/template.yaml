@@ -15,9 +15,9 @@
         {{ is_state('light.all_lights', 'off') }}
     is_gavin_asleep:
       value_template: >-
-        {{ now().hour > 20
-          and now().hour < 9
-          and is_state('all_lights_off', 'on')
+        {{ now().hour > 21
+          and now().hour < 10
+          and is_state('binary_sensor.all_lights_off', 'on')
           and is_state('person.gavin', 'home')
           and is_state('sensor.phone_is_charging', 'on') }}
     hall_or_landing_motion:
