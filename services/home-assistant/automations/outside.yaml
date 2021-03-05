@@ -1,4 +1,4 @@
-- alias: 'Turn on outside light when there is movement and no light'
+- alias: '[Outside] Turn on light when there is movement and no light'
   trigger:
     platform: state
     entity_id: binary_sensor.outside_sensor_occupancy
@@ -17,13 +17,26 @@
     data:
       brightness: 254
 
-- alias: 'Turn off outside light 2 minutes after last movement'
+- alias: '[Outside] Start/Restart timer if occupancy OR light is switched on'
   trigger:
-    platform: state
-    entity_id: light.outside_light
-    to: 'off'
-    for:
-      minutes: 2
+    - platform: state
+      entity_id: binary_sensor.outside_sensor_occupancy
+      to: 'on'
+    - platform: state
+      entity_id: light.outside_light
+      to: 'on'
+      from: 'off'
+  action:
+    service: timer.start
+    target:
+      entity_id: timer.outside
+
+- alias: "[Outside] Turn off outside light after timer finishes"
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.outside
   action:
     service: light.turn_off
     target:

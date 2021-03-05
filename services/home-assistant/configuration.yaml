@@ -68,6 +68,7 @@ recorder:
       - sensor
       - switch
       - alarm_control_panel
+      - automation
       - person
       - vacuum
       - binary_sensor
@@ -204,6 +205,10 @@ light:
 
 timer:
   kitchen:
+    duration: "00:07:00"
+  outside:
+    duration: "00:02:00"
+  office:
     duration: "00:05:00"
 
 person:

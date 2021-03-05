@@ -1,8 +1,12 @@
-- alias: 'Turn on kitchen light when pressed on'
+- alias: '[Kitchen] Turn on light when pressed on'
   trigger:
     platform: state
     entity_id: sensor.kitchen_switch_action
     to: 'on-press'
+  condition:
+    - condition: state
+      entity_id: light.kitchen_lights
+      state: 'off'
   action:
     - service: light.turn_on
       target:
@@ -20,7 +24,7 @@
         brightness: 190
         transition: 1
 
-- alias: 'Turn off kitchen light when pressed off'
+- alias: '[Kitchen] Turn off light when pressed off'
   trigger:
     platform: state
     entity_id: sensor.kitchen_switch_action
@@ -33,7 +37,7 @@
       target:
         entity_id: light.kitchen_light_strip
 
-- alias: 'Turn on kitchen light when there is movement before 11pm'
+- alias: '[Kitchen] Turn on light when there is movement before 11pm'
   trigger:
     platform: state
     entity_id: binary_sensor.kitchen_motion
@@ -87,7 +91,7 @@
         brightness: 190
         transition: 1
 
-- alias: 'Start/Restart timer if motion OR switch pressed in the kitchen'
+- alias: '[Kitchen] Start/Restart timer if occupancy OR light is switched on'
   trigger:
     - platform: state
       entity_id: binary_sensor.kitchen_motion
@@ -95,17 +99,37 @@
     - platform: state
       entity_id: light.kitchen_lights
       to: 'on'
+      from: 'off'
   action:
     service: timer.start
     target:
       entity_id: timer.kitchen
 
-- alias: "Turn off kitchen lights after timer finishes"
+- alias: "[Kitchen] If the timer ends but we still have occupancy reset it"
   trigger:
     platform: event
     event_type: timer.finished
     event_data:
       entity_id: timer.kitchen
+  condition:
+    - condition: state
+      entity_id: binary_sensor.kitchen_motion
+      state: 'on'
+  action:
+    service: timer.start
+    target:
+      entity_id: timer.kitchen
+
+- alias: "[Kitchen] If the timer ends and we have no occupancy turn off the light"
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.kitchen
+  condition:
+    - condition: state
+      entity_id: binary_sensor.kitchen_motion
+      state: 'off'
   action:
     service: light.turn_off
     target:

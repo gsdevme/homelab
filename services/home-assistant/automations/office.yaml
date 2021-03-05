@@ -1,0 +1,61 @@
+- alias: '[Office] Turn on the light when there is movement (and the light is off)'
+  trigger:
+    platform: state
+    entity_id: binary_sensor.office_sensor_occupancy
+    to: 'on'
+  condition:
+    - condition: state
+      entity_id: light.office_light
+      state: 'off'
+  action:
+    service: light.turn_on
+    target:
+      entity_id: light.office_light
+    data:
+      brightness: 254
+
+- alias: '[Office] Start/Restart timer if occupancy OR light is switched on'
+  trigger:
+    - platform: state
+      entity_id: binary_sensor.office_sensor_occupancy
+      to: 'on'
+    - platform: state
+      entity_id: light.office_light
+      to: 'on'
+      from: 'off'
+  action:
+    service: timer.start
+    target:
+      entity_id: timer.office
+
+- alias: "[Office] If the timer ends but we still have occupancy reset it"
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.office
+  condition:
+    - condition: state
+      entity_id: binary_sensor.office_sensor_occupancy
+      state: 'on'
+  action:
+    service: timer.start
+    target:
+      entity_id: timer.office
+
+- alias: "[Office] If the timer ends and we have no occupancy turn off the light"
+  trigger:
+    platform: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.office
+  condition:
+    - condition: state
+      entity_id: binary_sensor.office_sensor_occupancy
+      state: 'off'
+  action:
+    service: light.turn_off
+    target:
+      entity_id: light.office_light
+
+
