@@ -1,0 +1,212 @@
+defaultRules:
+  create: true
+  rules:
+    alertmanager: true
+    etcd: false
+    general: true
+    k8s: true
+    kubeApiserver: true
+    kubeApiserverAvailability: true
+    kubeApiserverError: true
+    kubeApiserverSlos: true
+    kubelet: true
+    kubePrometheusGeneral: true
+    kubePrometheusNodeAlerting: true
+    kubePrometheusNodeRecording: true
+    kubernetesAbsent: true
+    kubernetesApps: true
+    kubernetesResources: true
+    kubernetesStorage: true
+    kubernetesSystem: true
+    kubeScheduler: true
+    kubeStateMetrics: true
+    network: true
+    node: true
+    prometheus: true
+    prometheusOperator: true
+    time: true
+
+alertmanager:
+  enabled: false
+  ingress:
+    enabled: false
+    hosts:
+     - alert-manager.pi.gsdev.me
+    paths: []
+  ingressPerReplica:
+    enabled: false
+  servicePerReplica:
+    enabled: false
+  serviceMonitor:
+    selfMonitor: true
+  alertmanagerSpec:
+    storage:
+     volumeClaimTemplate:
+       spec:
+         storageClassName: longhorn
+         accessModes: ["ReadWriteOnce"]
+         resources:
+           requests:
+             storage: 8Gi
+    nodeSelector: {}
+    resources:
+     requests:
+       memory: 400Mi
+    securityContext:
+      runAsGroup: 2000
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
+    listenLocal: false
+
+grafana:
+  enabled: true
+  namespaceOverride: ""
+  defaultDashboardsEnabled: true
+
+  adminPassword: prom-operator
+
+  ingress:
+    enabled: true
+    hosts:
+      - grafana.pi.gsdev.me
+    path: /
+
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+
+      annotations: {}
+      multicluster: false
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+
+  extraConfigmapMounts: []
+  # - name: certs-configmap
+  #   mountPath: /etc/grafana/ssl/
+  #   configMap: certs-configmap
+  #   readOnly: true
+
+  ## Configure additional grafana datasources (passed through tpl)
+  ## ref: http://docs.grafana.org/administration/provisioning/#datasources
+  additionalDataSources: []
+  # - name: prometheus-sample
+  #   access: proxy
+  #   basicAuth: true
+  #   basicAuthPassword: pass
+  #   basicAuthUser: daco
+  #   editable: false
+  #   jsonData:
+  #       tlsSkipVerify: true
+  #   orgId: 1
+  #   type: prometheus
+  #   url: https://{{ printf "%s-prometheus.svc" .Release.Name }}:9090
+  #   version: 1
+
+  ## Passed to grafana subchart and used by servicemonitor below
+  ##
+  service:
+    portName: service
+  serviceMonitor:
+    selfMonitor: true
+
+kubeApiServer:
+  enabled: true
+kubelet:
+  enabled: true
+kubeControllerManager:
+  enabled: true
+coreDns:
+  enabled: false
+kubeDns:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: true
+kubeProxy:
+  enabled: true
+kubeStateMetrics:
+  enabled: true
+nodeExporter:
+  enabled: true
+prometheus-node-exporter:
+  namespaceOverride: ""
+  podLabels:
+    jobLabel: node-exporter
+  extraArgs:
+    - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/.+)($|/)
+    - --collector.filesystem.ignored-fs-types=^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$
+
+
+prometheusOperator:
+  enabled: true
+  tls:
+    enabled: true
+  admissionWebhooks:
+    failurePolicy: Fail
+    enabled: true
+    patch:
+      enabled: true
+    # Use certmanager to generate webhook certs
+    certManager:
+      enabled: false
+  serviceAccount:
+    create: true
+  kubeletService:
+    enabled: true
+    namespace: kube-system
+  serviceMonitor:
+    selfMonitor: true
+  resources:
+   limits:
+     cpu: 500m
+     memory: 200Mi
+   requests:
+     cpu: 100m
+     memory: 100Mi
+  securityContext:
+    fsGroup: 65534
+    runAsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 65534
+
+prometheus:
+  enabled: true
+  serviceAccount:
+    create: true
+  thanosService:
+    enabled: true
+  servicePerReplica:
+    enabled: false
+  thanosIngress:
+    enabled: false
+  ingress:
+    enabled: false
+  ingressPerReplica:
+    enabled: false
+  serviceMonitor:
+    selfMonitor: true
+  prometheusSpec:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1000Mi
+    requests:
+      cpu: 100m
+      memory: 500Mi
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: longhorn
+          accessModes: [ "ReadWriteOnce" ]
+          resources:
+            requests:
+              storage: 5Gi
+    securityContext:
+      runAsGroup: 2000
+      runAsNonRoot: true
+      runAsUser: 1000
+      fsGroup: 2000
