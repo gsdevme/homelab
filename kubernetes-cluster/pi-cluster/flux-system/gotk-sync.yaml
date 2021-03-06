@@ -5,7 +5,7 @@ metadata:
   name: flux-system
   namespace: flux-system
 spec:
-  interval: 1m0s
+  interval: 30m0s
   ref:
     branch: master
   secretRef:
@@ -18,7 +18,7 @@ metadata:
   name: flux-system
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 45m0s
   path: ./kubernetes-cluster/pi-cluster
   prune: true
   sourceRef:
