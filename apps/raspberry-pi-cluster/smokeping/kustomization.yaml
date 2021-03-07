@@ -4,3 +4,5 @@ namespace: smokeping
 resources:
   - ../../base/smokeping
   - ingress.yaml
+patchesStrategicMerge:
+  - statefulset.yaml

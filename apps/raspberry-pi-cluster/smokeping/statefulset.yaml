@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: smokeping
+spec:
+  serviceName: smokeping
+  volumeClaimTemplates:
+    - metadata:
+        name: smokeping-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: default
+        resources:
+          requests:
+            storage: 1Gi
