@@ -8,3 +8,5 @@ kubernetes/
 
 kubernetes-cluster/*/*/secrets.yaml
 services/*/*env
+
+**/kubeconfig
