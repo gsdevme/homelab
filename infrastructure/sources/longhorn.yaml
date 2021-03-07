@@ -1,7 +1,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
-  name: bitnami
+  name: longhorn
 spec:
-  interval: 4h0m0s
-  url: https://charts.bitnami.com/bitnami
+  interval: 36h0m0s
+  url: https://charts.longhorn.io

@@ -1,4 +1,0 @@
-namespace: flux-system
-
-resources:
-  - ../../common/influxdata-repository
