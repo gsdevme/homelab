@@ -70,22 +70,4 @@ spec:
   clusterIP: None
   selector:
     app: smokeping
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: smokeing-ingress
-  annotations:
-    kubernetes.io/ingress.class: 'nginx'
-spec:
-  rules:
-    - host: smokeping.pi.gsdev.me
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: smokeping-svc
-                port:
-                  number: 80
+
