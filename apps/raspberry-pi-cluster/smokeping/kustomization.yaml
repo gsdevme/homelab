@@ -3,5 +3,4 @@ kind: Kustomization
 namespace: smokeping
 resources:
   - ../../base/smokeping
-patchesStrategicMerge:
   - ingress.yaml
