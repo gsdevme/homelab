@@ -5,3 +5,5 @@ resources:
     - jetstack.yaml
     - influxdata.yaml
     - prometheus.yaml
+    - nginx.yaml
+    - longhorn.yaml
