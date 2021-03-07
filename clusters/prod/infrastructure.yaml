@@ -8,6 +8,6 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./infrastructure/raspberry-pi-cluster
+  path: ./infrastructure/prod
   prune: true
   validation: client
