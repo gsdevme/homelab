@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: smokeping
+spec:
+  serviceName: smokeping
+  selector:
+    matchLabels:
+      app: smokeping
+  template:
+    metadata:
+      labels:
+        app: smokeping
+    spec:
+      containers:
+        - name: smokeping
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "386Mi"
+            requests:
+              cpu: "200m"
+              memory: "128Mi"
+          image: ghcr.io/linuxserver/smokeping:version-2.7.3-r5
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: PUID
+              value: "1000"
+            - name: PGID
+              value: "1000"
+            - name: TZ
+              value: "Europe/London"
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - mountPath: "/data"
+              name: smokeping-data
+            - name: config
+              mountPath: "/config/Targets"
+              subPath: Targets
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: smokeping-config
+            items:
+              - key: "targets"
+                path: "Targets"
+  volumeClaimTemplates:
+    - metadata:
+        name: smokeping-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: longhorn
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smokeping-svc
+  labels:
+    app: smokeping
+spec:
+  ports:
+    - port: 80
+      name: http
+  clusterIP: None
+  selector:
+    app: smokeping
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: smokeing-ingress
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+spec:
+  rules:
+    - host: smokeping.pi.gsdev.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: smokeping-svc
+                port:
+                  number: 80

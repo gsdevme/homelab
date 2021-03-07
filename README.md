@@ -1,9 +1,27 @@
 # Homelab Monorepo
 
-[![Build Status](https://travis-ci.com/gsdevme/homelab.svg?branch=master)](https://travis-ci.com/gsdevme/homelab)
+```
+apps
+└── base
+    └── smokeping
+clusters
+└── raspberry-pi-cluster
+    ├── flux-system
+    └── infrastructure.yaml
+infrastructure
+├── kustomization.yaml
+├── longhorn
+├── nginx
+└── sources
+    ├── influxdata.yaml
+    ├── jetstack.yaml
+    ├── kustomization.yaml
+    ├── longhorn.yaml
+    ├── nginx.yaml
+    └── prometheus.yaml
+```
 
 # Prerequisites & Disaster Recovery
-
 
 ```
 # Install K3s (turn off SELinx, Firewalld etc on the host)

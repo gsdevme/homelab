@@ -1,0 +1,6 @@
+namespace: smokeping
+
+resources:
+  - namespace.yaml
+  - config.yaml
+  - statefulset.yaml
