@@ -9,4 +9,4 @@ spec:
       host: longhorn.prod.gsdev.me
       annotations:
         nginx.ingress.kubernetes.io/auth-type: basic
-        nginx.ingress.kubernetes.io/auth-secret: default/management-basic-auth
+        nginx.ingress.kubernetes.io/auth-secret: basic-auth
