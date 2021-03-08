@@ -62,7 +62,7 @@ mqtt:
   discovery: true
 
 recorder:
-  purge_keep_days: 14
+  purge_keep_days: 3
   include:
     domains:
       - sensor
@@ -76,6 +76,10 @@ recorder:
       - camera
       - sun
       - timer
+  exclude:
+    entity_globs:
+      - '*illuminance'
+      - '*motion_sensitivity'
   db_url: !env_var RECORDER_DSN sqlite:////config/home-assistant.sqlite
 
 weather:
@@ -93,6 +97,10 @@ map:
 history:
 sun:
 logbook:
+  exclude:
+    entity_globs:
+      - '*illuminance'
+      - '*motion_sensitivity'
 
 zone:
   - name: Home
