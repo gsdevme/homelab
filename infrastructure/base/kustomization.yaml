@@ -5,4 +5,5 @@ resources:
   - kubernetes-secret-generator
   - cert-manager
   - nginx
+  - letsencrypt
   - longhorn
