@@ -28,6 +28,11 @@ data:
     title = YouTube
     host = youtube.com
 
+    ++ Slack
+    menu = Slack
+    title = Slack
+    host = slack.com
+
     ++ GoogleSearch
     menu = Google
     title = google.com
@@ -42,6 +47,16 @@ data:
     menu = GANT UK
     title = gant.co.uk
     host = www.gant.co.uk
+
+    ++ Amazon
+    menu = Amazon UK
+    title = amazon.co.uk
+    host = www.amazon.co.uk
+
+    ++ Reddit
+    menu = Reddit
+    title = old.reddit.com
+    host = old.reddit.com
 
     + DNS
     menu = DNS
