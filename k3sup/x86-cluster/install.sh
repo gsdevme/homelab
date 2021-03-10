@@ -12,7 +12,7 @@ fi
 KUBE_VIP="172.16.16.80"
 LB="$KUBE_VIP"
 
-VERSION="v1.20.2+k3s1"
+VERSION="v1.20.4+k3s1"
 
 SSH_USER="root"
 
