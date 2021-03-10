@@ -1,0 +1,33 @@
+alertmanager:
+  enabled: false
+
+grafana:
+  enabled: false
+
+kubeEtcd:
+  enabled: false
+
+prometheus:
+  enabled: true
+  serviceAccount:
+    create: true
+  thanosService:
+    enabled: true
+  servicePerReplica:
+    enabled: false
+  thanosIngress:
+    enabled: false
+  ingress:
+    enabled: false
+  ingressPerReplica:
+    enabled: false
+  serviceMonitor:
+    selfMonitor: true
+  prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: [ "ReadWriteOnce" ]
+          resources:
+            requests:
+              storage: 5Gi
