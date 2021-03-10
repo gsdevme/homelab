@@ -6,4 +6,5 @@ resources:
   - cert-manager
   - nginx
   - letsencrypt
+  - minio
   - longhorn
