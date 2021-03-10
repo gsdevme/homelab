@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: smokeping
 resources:
   - ../../base/smokeping
+  - basic-auth.yaml
   - ingress.yaml
 patchesStrategicMerge:
   - statefulset.yaml
