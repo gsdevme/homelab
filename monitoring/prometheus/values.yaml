@@ -31,3 +31,4 @@ prometheus:
           resources:
             requests:
               storage: 12Gi
+              allowVolumeExpansion: true
