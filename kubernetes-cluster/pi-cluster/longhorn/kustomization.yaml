@@ -1,7 +1,0 @@
-namespace: longhorn-system
-
-resources:
-  - ../../common/longhorn
-
-patchesStrategicMerge:
-  - config.yaml

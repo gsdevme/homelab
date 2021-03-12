@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: glasgow-bin-config
-data:
-  MQTT_HOST: "mqtt.home.gsdev.me"
-  GLASGOW_COUNCIL_ID: "906700523274"
