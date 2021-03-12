@@ -1,4 +1,4 @@
-# Pi k3s Cluster
+# k3s Cluster
 
 K3s cluster is installed with [k3sup](https://github.com/alexellis/k3sup#create-a-multi-master-ha-setup-with-embedded-etcd) and using the embedded etcd requiring a minimum of 3x nodes.
 
