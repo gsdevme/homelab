@@ -25,7 +25,6 @@ spec:
       containers:
         - name: dnsmasq
           securityContext:
-            privileged: true
             capabilities:
               add: [ "NET_ADMIN" ]
           image: gsdevme/lan_dns:latest
