@@ -7,6 +7,7 @@ ansible/
 kubernetes/
 
 kubernetes-cluster/*/*/secrets.yaml
+apps/*/*/secrets.yaml
 services/*/*env
 
 **/kubeconfig
