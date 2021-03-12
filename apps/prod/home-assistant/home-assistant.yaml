@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-home-assistant
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-home-assistant
+spec:
+  selector:
+    app: home-assistant
+  ports:
+    - port: 80
+      targetPort: 8123
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: home-assistant-deployment
+  labels:
+    app: home-assistant
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: home-assistant
+  template:
+    metadata:
+      labels:
+        app: home-assistant
+    spec:
+      volumes:
+        - name: home-assistant-persistent-storage
+          persistentVolumeClaim:
+            claimName: pvc-home-assistant
+      containers:
+        - name: home-assistant
+          imagePullPolicy: Always
+          image: gsdevme/home-assistant:latest
+          envFrom:
+            - secretRef:
+                name: home-assistant-secrets
+          ports:
+            - containerPort: 8123
+              protocol: TCP
+          volumeMounts:
+            - name: home-assistant-persistent-storage
+              mountPath: "/config/.storage"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: home-assistant-ingress
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  rules:
+    - host: home-assistant.home.gsdev.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-home-assistant
+                port:
+                  number: 80
+  tls:
+    - hosts:
+        - home-assistant.home.gsdev.me
+      secretName: home-assistant-home-gsdev-me-tls
