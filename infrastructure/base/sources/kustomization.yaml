@@ -7,4 +7,5 @@ resources:
   - influxdata.yaml
   - prometheus.yaml
   - nginx.yaml
+  - minio.yaml
   - longhorn.yaml
