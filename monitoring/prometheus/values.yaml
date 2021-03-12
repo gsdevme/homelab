@@ -1,8 +1,8 @@
 alertmanager:
   enabled: false
 
-grafana:
-  enabled: false
+#grafana:
+#  enabled: false
 
 kubeEtcd:
   enabled: false
