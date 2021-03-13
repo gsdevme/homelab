@@ -19,7 +19,7 @@ spec:
   values:
     persistence:
       defaultClass: true
-      defaultClassReplicaCount: 2
+      defaultClassReplicaCount: 3
     ingress:
       enabled: true
       host: longhorn.pi.gsdev.me
