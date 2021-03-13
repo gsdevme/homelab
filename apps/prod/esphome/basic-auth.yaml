@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-auth
+  annotations:
+    secret-generator.v1.mittwald.de/type: basic-auth
+data: {}

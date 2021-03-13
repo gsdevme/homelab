@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: esphome
+spec:
+  serviceName: esphome
+  selector:
+    matchLabels:
+      app: esphome
+  template:
+    metadata:
+      labels:
+        app: esphome
+    spec:
+      containers:
+        - name: esphome
+          resources:
+            limits:
+              cpu: "1000m"
+              memory: "1024Mi"
+            requests:
+              cpu: "200m"
+              memory: "128Mi"
+          image: esphome/esphome:1.15.3
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6052
+          volumeMounts:
+            - mountPath: "/config"
+              name: esphome-data
+  volumeClaimTemplates:
+    - metadata:
+        name: esphome-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: esphome-svc
+  labels:
+    app: esphome
+spec:
+  ports:
+    - port: 80
+      targetPort: 6052
+  clusterIP: None
+  selector:
+    app: esphome
+
