@@ -33,6 +33,56 @@ input_datetime:
     has_date: true
     has_time: false
 
+camera:
+  - platform: generic
+    still_image_url: !env_var GARDEN_LEFT_CAMERA_SNAP 127.0.0.1
+    stream_source: !env_var GARDEN_LEFT_CAMERA 127.0.0.1
+    name: "Garden Left"
+
+#image_processing:
+#  - platform: doods
+#    url: "http://172.16.16.136:8080"
+#    detector: default
+#    source:
+#      - entity_id: camera.garden_left
+#    file_out:
+#      - "/tmp/{{ camera_entity.split('.')[1] }}_latest.jpg"
+#      - "/tmp/{{ camera_entity.split('.')[1] }}_{{ now().strftime('%Y%m%d_%H%M%S') }}.jpg"
+#    confidence: 50
+#    scan_interval: 2
+#    labels:
+#      - name: person
+#        confidence: 40
+
+influxdb:
+  api_version: 2
+  ssl: false
+  host: !env_var INFLUX_HOST 127.0.0.1
+  token: !env_var INFLUX_TOKEN not_a_real_token
+  bucket: home-assistant
+  organization: be914a74245f8060
+  tags:
+    source: ha
+  port: 80
+  include:
+    entities:
+      - binary_sensor.is_gavin_asleep
+      - binary_sensor.people_home
+      - binary_sensor.mqtt_guest_mode
+      - binary_sensor.all_lights_off
+    domains:
+      - alarm_control_panel
+      - light
+      - plant
+      - person
+      - timer
+      - zone
+    entity_globs:
+      - binary_sensor.*_battery_*
+      - binary_sensor.battery_*
+      - sensor.*_steps
+      - sensor.*_activity
+
 alexa:
   smart_home:
     locale: en-GB
@@ -80,6 +130,7 @@ recorder:
     entity_globs:
       - '*illuminance'
       - '*motion_sensitivity'
+      - '*update_available'
   db_url: !env_var RECORDER_DSN sqlite:////config/home-assistant.sqlite
 
 weather:
@@ -101,6 +152,7 @@ logbook:
     entity_globs:
       - '*illuminance'
       - '*motion_sensitivity'
+      - '*update_available'
 
 zone:
   - name: Home
@@ -138,6 +190,8 @@ lovelace:
       type: module
     - url: /local/layout-card.js
       type: module
+    - url: /local/clockwork-card.js
+      type: js
 
 alarm_control_panel:
   - platform: template
@@ -189,6 +243,7 @@ light:
     entities:
       - light.kitchen_front_light
       - light.kitchen_rear_light
+      - light.kitchen_light_strip
   - platform: group
     name: downstairs_lights
     entities:
@@ -197,6 +252,7 @@ light:
       - light.living_room_lights
       - light.downstairs_cupboard_light
       - light.outside_light
+      - light.kitchen_lights
   - platform: group
     name: upstairs_lights
     entities:
@@ -224,9 +280,10 @@ person:
     id: gavin
     device_trackers:
       - device_tracker.iphone_x
+      - device_tracker.iphone_x_2
     user_id: 101
   - name: Ceilidh
     id: ceilidh
     user_id: 102
-#    device_trackers:
-#      - device_tracker.ceilidh_phone_via_mqtt
+    device_trackers:
+      - device_tracker.ceilidhs_phone

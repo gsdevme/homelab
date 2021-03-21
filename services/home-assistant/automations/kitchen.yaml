@@ -15,14 +15,6 @@
         brightness: 254
         color_temp: 200
         transition: 1
-    # Light strip cannot go over 200 as it will use more than 10 watts
-    # @todo buy the 30 watt version once Covid-19 is over and you can visit IKEA
-    - service: light.turn_on
-      target:
-        entity_id: light.kitchen_light_strip
-      data:
-        brightness: 190
-        transition: 1
 
 - alias: '[Kitchen] Turn off light when pressed off'
   trigger:
@@ -33,9 +25,6 @@
     - service: light.turn_off
       target:
         entity_id: light.kitchen_lights
-    - service: light.turn_off
-      target:
-        entity_id: light.kitchen_light_strip
 
 - alias: '[Kitchen] Turn on light when there is movement before 11pm'
   trigger:
@@ -56,14 +45,6 @@
         brightness: 254
         color_temp: 200
         transition: 1
-    # Light strip cannot go over 200 as it will use more than 10 watts
-    # @todo buy the 30 watt version once Covid-19 is over and you can visit IKEA
-    - service: light.turn_on
-      target:
-        entity_id: light.kitchen_light_strip
-      data:
-        brightness: 190
-        transition: 1
 
 - alias: 'Turn on kitchen light when there is movement after 11pm'
   trigger:
@@ -81,15 +62,7 @@
       target:
         entity_id: light.kitchen_lights
       data:
-        brightness: 60
-    # Light strip cannot go over 200 as it will use more than 10 watts
-    # @todo buy the 30 watt version once Covid-19 is over and you can visit IKEA
-    - service: light.turn_on
-      target:
-        entity_id: light.kitchen_light_strip
-      data:
-        brightness: 190
-        transition: 1
+        brightness: 50
 
 - alias: '[Kitchen] Start/Restart timer if occupancy OR light is switched on'
   trigger:
@@ -135,4 +108,3 @@
     target:
       entity_id:
         - light.kitchen_lights
-        - light.kitchen_light_strip

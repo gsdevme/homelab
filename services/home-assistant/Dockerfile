@@ -20,7 +20,8 @@ RUN chmod +x /bin/entrypoint.sh && \
 
 RUN cd /config/www/ && \
     wget https://github.com/denysdovhan/vacuum-card/releases/download/v1.12.0/vacuum-card.js && \
-    wget https://raw.githubusercontent.com/thomasloven/lovelace-layout-card/master/layout-card.js && \
+    wget https://raw.githubusercontent.com/thomasloven/lovelace-layout-card/16/layout-card.js && \
+    wget https://raw.githubusercontent.com/robmarkoski/ha-clockwork-card/v0.1.2/clockwork-card.js && \
     wget https://raw.githubusercontent.com/thomasloven/lovelace-auto-entities/master/auto-entities.js
 
 # Assert the configuration is ok before finalising the image

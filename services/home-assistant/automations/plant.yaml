@@ -1,0 +1,11 @@
+- alias: 'RED ALERT'
+  trigger:
+    - platform: state
+      entity_id: alarm_control_panel.automated_alarm_panel
+      to: "triggered"
+  action:
+    - service: notify.notify
+      data:
+        message: "Hey! I'm getting thirsty!"
+
+

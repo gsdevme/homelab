@@ -9,6 +9,11 @@ views:
         min_columns: 1
         max_columns: 3
         cards:
+          - type: 'custom:clockwork-card'
+            locale: en-GB
+            entity: sensor.date_time_iso
+            other_time:
+              - "America/New_York"
           - type: grid
             columns: 3
             cards:
@@ -44,6 +49,10 @@ views:
                     entity: sensor.mqtt_xiaomi_atc_58447f_office_temperature
                     graph: line
                     hours_to_show: 6
+                  - type: sensor
+                    entity: sensor.spare_bedroom_sensor_temperature
+                    graph: line
+                    hours_to_show: 6
               - type: vertical-stack
                 cards:
                   - type: sensor
@@ -58,6 +67,19 @@ views:
                     entity: sensor.mqtt_xiaomi_atc_3ed9e6_master_bedroom_temperature
                     graph: line
                     hours_to_show: 6
+                  - type: sensor
+                    entity: sensor.mqtt_xiaomi_outside_temperature
+                    graph: line
+                    hours_to_show: 6
+          - type: custom:auto-entities
+            card:
+              type: entities
+            filter:
+              include:
+                - entity_id: "*_humidity"
+              exclude:
+                - state: unknown
+                - state: '< 65'
           - break
           - type: glance
             entities:
@@ -65,15 +87,20 @@ views:
               - entity: binary_sensor.mqtt_frontdoor
               - entity: binary_sensor.mqtt_office_window
             state_color: true
-          - type: glance
-            entities:
-              - alarm_control_panel.automated_alarm_panel
-              - switch.mqtt_guest_mode_switch
+          - type: custom:auto-entities
+            show_empty: false
+            card:
+              type: glance
+              state_color: true
+            filter:
+              include:
+                - domain: person
+                - entity_id: "alarm_control_panel.automated_alarm_panel"
+                - entity_id: "switch.mqtt_guest_mode_switch"
           - type: custom:auto-entities
             show_empty: false
             card:
               type: entities
-              title: Batteries
             sort:
               numeric: true
             filter:
@@ -85,24 +112,11 @@ views:
                 - state: unknown
                 - state: unavailable
                 - state: Not Charging
+                - state: Full
                 - state: '> 20'
-          - type: custom:auto-entities
-            show_empty: false
-            card:
-              type: glance
-              state_color: true
-            filter:
-              include:
-                - domain: person
-          - type: custom:auto-entities
-            card:
-              type: entities
-            filter:
-              include:
-                - entity_id: "*_humidity"
-              exclude:
-                - state: unknown
-                - state: '< 65'
+          - type: picture-entity
+            entity: camera.garden_left
+            camera_view: live
           - break
           - type: plant-status
             entity: plant.kitchen_plant
@@ -142,6 +156,9 @@ views:
         filter:
           include:
             - domain: binary_sensor
+          exclude:
+            - entity_id: "*_update_available"
+            - entity_id: "*_led_indication"
       - type: custom:auto-entities
         show_empty: false
         card:
@@ -149,6 +166,14 @@ views:
         filter:
           include:
             - domain: sensor
+          exclude:
+            - entity_id: "*_update_state"
+            - entity_id: "*_linkquality"
+            - entity_id: "*_sensor_illuminance"
+            - entity_id: "*_illuminance_lux"
+            - entity_id: "*_motion_sensitivity"
+            - entity_id: "*_occupancy_timeout"
+            - entity_id: "*_battery"
       - type: custom:auto-entities
         show_empty: false
         card:
@@ -167,6 +192,13 @@ views:
         show_empty: false
         card:
           type: entities
+        filter:
+          include:
+            - domain: camera
+      - type: custom:auto-entities
+        show_empty: false
+        card:
+          type: entities
           title: Batteries
         sort:
           numeric: true
@@ -175,42 +207,3 @@ views:
             - domain: sensor
               attributes:
                 device_class: battery
-#      - type: vertical-stack
-#          title: Synology NAS
-#          cards:
-#            - type: horizontal-stack
-#              cards:
-#                - type: gauge
-#                  entity: sensor.vault_cpu_load_5_min
-#                  min: 0
-#                  max: 400
-#                  severity:
-#                    green: 100
-#                    yellow: 275
-#                    red: 375
-#                - type: gauge
-#                  entity: sensor.vault_volume_1_volume_used
-#                  min: 0
-#                  max: 100
-#                  severity:
-#                    green: 0
-#                    yellow: 85
-#                    red: 95
-#            - type: horizontal-stack
-#              cards:
-#                - type: gauge
-#                  entity: sensor.vault_temperature
-#                  min: 0
-#                  max: 100
-#                  severity:
-#                    green: 30
-#                    yellow: 45
-#                    red: 50
-#                - type: gauge
-#                  entity: sensor.vault_volume_1_average_disk_temp
-#                  min: 0
-#                  max: 45
-#                  severity:
-#                    green: 30
-#                    yellow: 42
-#                    red: 48

@@ -47,6 +47,10 @@ sensor.vault_temperature:
 sensor.vault_volume_1_average_disk_temp:
   friendly_name: Disk Temp
 
+sensor.mqtt_xiaomi_outside_temperature:
+  friendly_name: Outside
+sensor.spare_bedroom_sensor_temperature:
+  friendly_name: Spare Bedroom
 sensor.mqtt_xiaomi_loft_temperature:
   friendly_name: Loft
 sensor.mqtt_xiaomi_loft_room_humidity:
@@ -54,6 +58,9 @@ sensor.mqtt_xiaomi_loft_room_humidity:
 
 sensor.mqtt_xiaomi_ensuite_humidity:
   friendly_name: Ensuite
+
+sensor.rack_sensor_temperature:
+  friendly_name: Rack
 
 binary_sensor.mqtt_backdoor:
   friendly_name: Backdoor
