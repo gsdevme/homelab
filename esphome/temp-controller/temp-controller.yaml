@@ -142,3 +142,13 @@ sensor:
       name: "Loft Humidity"
     battery_level:
       name: "Loft Battery Level"
+  # LYWSD03MMC
+  - platform: xiaomi_lywsd03mmc
+    mac_address: "A4:C1:38:98:93:79"
+    bindkey: "df13b8110a195d32f0c656c2da2c7c45"
+    temperature:
+      name: "Outside Temperature"
+    humidity:
+      name: "Outside Humidity"
+    battery_level:
+      name: "Outside Battery Level"
