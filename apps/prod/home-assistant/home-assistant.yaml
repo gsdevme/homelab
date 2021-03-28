@@ -39,16 +39,6 @@ spec:
       labels:
         app: home-assistant
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: k3s.io/hostname
-                    operator: In
-                    values:
-                      - kube-master-1
-                      - kube-master-2
       volumes:
         - name: home-assistant-persistent-storage
           persistentVolumeClaim:
