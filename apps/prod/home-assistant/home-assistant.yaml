@@ -39,6 +39,15 @@ spec:
       labels:
         app: home-assistant
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    longhorn-volume-replica: home-assistant-persistent-storage
+                topologyKey: kubernetes.io/hostname
+              weight: 100
       volumes:
         - name: home-assistant-persistent-storage
           persistentVolumeClaim:
