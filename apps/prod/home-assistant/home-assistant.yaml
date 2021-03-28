@@ -40,14 +40,15 @@ spec:
         app: home-assistant
     spec:
       affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - podAffinityTerm:
-                labelSelector:
-                  matchLabels:
-                    longhorn-volume-replica: home-assistant-persistent-storage
-                topologyKey: k3s.io/hostname
-              weight: 100
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: k3s.io/hostname
+                    operator: In
+                    values:
+                      - kube-master-1
+                      - kube-master-2
       volumes:
         - name: home-assistant-persistent-storage
           persistentVolumeClaim:
