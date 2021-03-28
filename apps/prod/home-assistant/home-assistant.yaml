@@ -46,7 +46,7 @@ spec:
                 labelSelector:
                   matchLabels:
                     longhorn-volume-replica: home-assistant-persistent-storage
-                topologyKey: kubernetes.io/hostname
+                topologyKey: k3s.io/hostname
               weight: 100
       volumes:
         - name: home-assistant-persistent-storage
