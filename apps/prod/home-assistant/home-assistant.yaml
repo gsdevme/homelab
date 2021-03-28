@@ -47,6 +47,13 @@ spec:
         - name: home-assistant
           imagePullPolicy: Always
           image: gsdevme/home-assistant:latest
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "300m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"
           envFrom:
             - secretRef:
                 name: home-assistant-secrets
