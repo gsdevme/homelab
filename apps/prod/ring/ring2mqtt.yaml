@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ring-deployment
+  labels:
+    app: ring
+spec:
+  selector:
+    matchLabels:
+      app: ring
+  template:
+    metadata:
+      labels:
+        app: ring
+    spec:
+      containers:
+        - name: ring
+          imagePullPolicy: Always
+          image: tsightler/ring-mqtt
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          envFrom:
+            - secretRef:
+                name: ring-secrets
+            - configMapRef:
+                name: ring-config
