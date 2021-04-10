@@ -15,7 +15,8 @@ COPY *.yaml /config/
 COPY entrypoint.sh /bin/entrypoint.sh
 
 RUN chmod +x /bin/entrypoint.sh && \
-    apk --no-cache add apache2-utils jq && \
+    apk --no-cache add apache2-utils jq tzdata && \
+    echo "Europe/London" >  /etc/timezone && \
     mkdir -p /config/www
 
 RUN cd /config/www/ && \

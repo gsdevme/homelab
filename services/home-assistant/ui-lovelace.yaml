@@ -113,7 +113,7 @@ views:
                 - state: unavailable
                 - state: Not Charging
                 - state: Full
-                - state: '> 20'
+                - state: '> 10'
           - type: picture-entity
             entity: camera.garden_left
             camera_view: live

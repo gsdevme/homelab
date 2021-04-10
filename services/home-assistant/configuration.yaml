@@ -8,7 +8,7 @@ homeassistant:
 http:
   use_x_forwarded_for: true
   login_attempts_threshold: 10
-  ip_ban_enabled: true
+  ip_ban_enabled: false
   trusted_proxies:
     - 172.16.16.0/24
     - 10.0.0.0/8
@@ -70,6 +70,14 @@ influxdb:
       - binary_sensor.people_home
       - binary_sensor.mqtt_guest_mode
       - binary_sensor.all_lights_off
+      - sensor.hall_temperature
+      - sensor.kitchen_temperature
+      - sensor.living_room_temperature
+      - sensor.landing_sensor_temperature
+      - sensor.mqtt_xiaomi_a4_c1_38_79_01_ce_ensuite_temperature
+      - sensor.mqtt_xiaomi_atc_58447f_office_temperature
+      - sensor.mqtt_xiaomi_loft_temperature
+      - sensor.mqtt_xiaomi_outside_temperature
     domains:
       - alarm_control_panel
       - light
@@ -112,7 +120,7 @@ mqtt:
   discovery: true
 
 recorder:
-  purge_keep_days: 3
+  purge_keep_days: 2
   include:
     domains:
       - sensor
@@ -131,15 +139,11 @@ recorder:
       - '*illuminance'
       - '*motion_sensitivity'
       - '*update_available'
+      - '*date_time_iso'
   db_url: !env_var RECORDER_DSN sqlite:////config/home-assistant.sqlite
 
 weather:
 frontend:
-
-synology_dsm:
-  - host: !env_var DSM_HOST 127.0.0.1
-    username: !env_var DSM_USERNAME home-assistant
-    password: !env_var DSM_PASSWORD home-assistant
 
 mobile_app:
 discovery:

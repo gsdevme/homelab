@@ -1,4 +1,5 @@
 - alias: 'Trigger alarm while armed away if motion'
+  id: trigger_alarm_while_armed_away_if_motion
   trigger:
     - platform: state
       entity_id: binary_sensor.motion_inside
