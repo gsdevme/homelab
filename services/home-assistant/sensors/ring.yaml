@@ -1,0 +1,6 @@
+- platform: mqtt
+  unique_id: "frontdoor_ring_battery"
+  name: "frontdoor_ring_battery"
+  state_topic: "ring/b6cecb06-eadc-40aa-4a23-c7c7e6135f49/camera/a8e2c132a21a/info/state"
+  unit_of_measurement: "%"
+  value_template: "{{ value_json.batteryLevel }}"
