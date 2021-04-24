@@ -15,6 +15,14 @@ spec:
     spec:
       containers:
         - name: ring
+          # Terrible hack to just restart it every day (at 3am)
+          livenessProbe:
+            exec:
+              command:
+                - exit $(test $(date +%H) -eq 3 && echo 1 || echo 0)
+            failureThreshold: 1
+            initialDelaySeconds: 3600
+            periodSeconds: 60
           imagePullPolicy: Always
           image: tsightler/ring-mqtt
           resources:
