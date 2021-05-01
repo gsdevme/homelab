@@ -27,8 +27,8 @@ spec:
           image: tsightler/ring-mqtt
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "100m"
+              memory: "128Mi"
+              cpu: "250m"
             limits:
               memory: "256Mi"
               cpu: "500m"
