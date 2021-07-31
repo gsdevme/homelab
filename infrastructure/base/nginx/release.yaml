@@ -29,4 +29,5 @@ spec:
         compute-full-forwarded-for: true
         enable-real-ip: true
         use-forwarded-headers: true
+        proxy-real-ip-cidr: "172.16.16.1/24,10.42.0.1/16"
 
