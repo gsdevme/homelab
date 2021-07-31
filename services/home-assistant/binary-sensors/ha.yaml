@@ -1,7 +1,0 @@
-- platform: mqtt
-  state_topic: "homeassistant/guest_mode/state"
-  payload_on: "ON"
-  payload_off: "OFF"
-  device_class: presence
-  name: 'mqtt_guest_mode'
-  unique_id: 'mqtt_guest_mode'

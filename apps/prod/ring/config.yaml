@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ring-config
-data:
-  MQTTHOST: "mqtt.home.gsdev.me"
-  MQTTRINGTOPIC: "ring"
-  ENABLECAMERAS: "true"

@@ -22,4 +22,4 @@ spec:
       defaultClassReplicaCount: 3
     ingress:
       enabled: true
-      host: longhorn.pi.gsdev.me
+      host: longhorn.prod.gsdev.me
