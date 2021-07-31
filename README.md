@@ -55,11 +55,3 @@ infrastructure
 └── raspberry-pi-cluster
     └── kustomization.yaml
 ```
-
-## Common Problems
-
-Disabling the default storage class used in k3s in favour of longhorn
-
-```json
-kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-```

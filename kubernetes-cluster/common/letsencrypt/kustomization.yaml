@@ -1,3 +1,0 @@
-resources:
-  - issuer-staging.yaml
-  - issuer-prod.yaml

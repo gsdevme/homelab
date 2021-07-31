@@ -1,4 +1,0 @@
-namespace: data
-
-resources:
-  - statefulset.yaml
