@@ -18,9 +18,10 @@ spec:
       retries: 3
   values:
     controller:
+      service:
+        type: LoadBalancer
+        externalTrafficPolicy: local
       config:
         use-gzip: true
         gzip-level: 9
-#    service:
-#      type: LoadBalancer
-#      externalTrafficPolicy: local
+
