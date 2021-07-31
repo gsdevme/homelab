@@ -19,7 +19,6 @@ spec:
   values:
     controller:
       config:
-        use-proxy-protocol: true
         use-gzip: true
         gzip-level: 9
 #    service:
