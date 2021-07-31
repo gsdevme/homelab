@@ -24,5 +24,7 @@ spec:
       config:
         use-gzip: true
         gzip-level: 9
+        brotli-level: 6
+        enable-brotli: true
         use-forwarded-headers: true
 
