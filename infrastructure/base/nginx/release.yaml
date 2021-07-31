@@ -24,4 +24,5 @@ spec:
       config:
         use-gzip: true
         gzip-level: 9
+        use-forwarded-headers: true
 
