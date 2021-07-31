@@ -19,4 +19,4 @@ spec:
   values:
     service:
       type: LoadBalancer
-      externalTrafficPolicy: local
+      #externalTrafficPolicy: local
