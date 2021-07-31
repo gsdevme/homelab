@@ -2,3 +2,4 @@ resources:
   - 1-namespace.yaml
   - 2-config.yaml
   - deployment.yaml
+  - hpa.yaml

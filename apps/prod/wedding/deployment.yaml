@@ -6,7 +6,7 @@ metadata:
   labels:
     app: wedding
 spec:
-  replicas: 3
+  revisionHistoryLimit: 2
   selector:
     matchLabels:
       app: wedding
@@ -24,8 +24,16 @@ spec:
           securityContext:
             # www-data
             runAsUser: 33
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
           image: gsdevme/wedding-website:prod
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 512Mi
           livenessProbe:
             exec:
               command:
