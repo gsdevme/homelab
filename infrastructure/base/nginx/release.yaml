@@ -26,5 +26,6 @@ spec:
         gzip-level: 9
         brotli-level: 6
         enable-brotli: true
+        compute-full-forwarded-for: true
         use-forwarded-headers: true
 
