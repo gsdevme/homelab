@@ -4,4 +4,7 @@ k3os:
   password: rancher
   k3s_args:
   - server
-  - "--no-deploy=traefik"
+  - --cluster-init
+  - "--write-kubeconfig-mode 0664"
+  - "--disable traefik"
+  - "--disable local-storage"
