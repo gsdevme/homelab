@@ -8,3 +8,4 @@ k3os:
   - "--write-kubeconfig-mode 0664"
   - "--disable traefik"
   - "--disable local-storage"
+  - "--tls-san kube.lan"
