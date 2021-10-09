@@ -1,0 +1,7 @@
+ssh_authorized_keys:
+- github:gsdevme
+k3os:
+  password: rancher
+  k3s_args:
+  - server
+  - "--no-deploy=traefik"
