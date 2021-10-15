@@ -25,6 +25,7 @@ prometheus:
     selfMonitor: true
   prometheusSpec:
     storageSpec:
+      retention: 3d
       volumeClaimTemplate:
         spec:
           storageClassName: longhorn
