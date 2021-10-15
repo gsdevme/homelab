@@ -6,8 +6,10 @@ spec:
   accessModes:
     - ReadWriteOnce
   resources:
+     limits:
+      storage: 768Mi
     requests:
-      storage: 1Gi
+      storage: 512Mi
 ---
 apiVersion: v1
 kind: Service
