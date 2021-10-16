@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-mysql
+spec:
+  storageClassName: "longhorn"
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  serviceName: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: pvc-mysql
+      containers:
+        - name: mysql
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: "/var/lib/mysql"
+              subPath: "mysql"
+          imagePullPolicy: IfNotPresent
+          image: mysql:5.7.35
+          envFrom:
+            - configMapRef:
+                name: mysql-config
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 3000Mi
+            requests:
+              cpu: 200m
+              memory: 2000Mi
+          livenessProbe:
+            exec:
+              command:
+                - echo
+                - -n
+                - >
+                - /dev/tcp/127.0.0.1/3306
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            failureThreshold: 2
+          ports:
+            - containerPort: 3306
+              name: mysql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+    - port: 3306
+      targetPort: mysql
+      name: mysql
