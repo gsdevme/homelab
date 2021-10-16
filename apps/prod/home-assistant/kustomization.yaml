@@ -2,3 +2,4 @@ namespace: home-assistant
 resources:
   - namespace.yaml
   - home-assistant.yaml
+  - unifi-poller.yaml
