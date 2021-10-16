@@ -33,9 +33,6 @@ spec:
                 name: unifi-ha-presence
             - secretRef:
                 name: unifi-ha-presence
-          securityContext:
-            runAsNonRoot: true
-            allowPrivilegeEscalation: false
           resources:
             limits:
               memory: "32Mi"
