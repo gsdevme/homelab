@@ -37,8 +37,8 @@ spec:
             runAsNonRoot: true
             allowPrivilegeEscalation: false
           resources:
-            requests:
+            limits:
               memory: "32Mi"
               cpu: "100m"
-            limits:
+            requests:
               cpu: "50m"
