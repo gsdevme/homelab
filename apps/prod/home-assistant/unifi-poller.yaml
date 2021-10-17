@@ -27,7 +27,7 @@ spec:
       containers:
         - name: unifi-ha-presence
           imagePullPolicy: IfNotPresent
-          image: gsdevme/unifi-ha-presence-mqtt:v1.0.1
+          image: gsdevme/unifi-ha-presence-mqtt:v1.2.0
           envFrom:
             - configMapRef:
                 name: unifi-ha-presence
