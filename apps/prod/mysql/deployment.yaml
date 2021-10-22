@@ -25,6 +25,8 @@ spec:
       labels:
         app: mysql
     spec:
+      nodeSelector:
+        cputype: arm
       volumes:
         - name: mysql-storage
           persistentVolumeClaim:
@@ -36,14 +38,14 @@ spec:
               mountPath: "/var/lib/mysql"
               subPath: "mysql"
           imagePullPolicy: IfNotPresent
-          image: mysql:5.7.35
+          image: mariadb:10.6.4
           envFrom:
             - configMapRef:
                 name: mysql-config
           resources:
             limits:
               cpu: 1000m
-              memory: 3000Mi
+              memory: 2500Mi
             requests:
               cpu: 500m
               memory: 2000Mi
