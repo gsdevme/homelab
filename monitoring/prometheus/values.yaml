@@ -1,8 +1,8 @@
 alertmanager:
   enabled: false
 
-#grafana:
-#  enabled: false
+grafana:
+  enabled: true
 
 kubeEtcd:
   enabled: false
@@ -32,4 +32,4 @@ prometheus:
           accessModes: [ "ReadWriteOnce" ]
           resources:
             requests:
-              storage: 10Gi
+              storage: 15Gi
