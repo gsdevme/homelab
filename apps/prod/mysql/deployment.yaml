@@ -25,6 +25,8 @@ spec:
       labels:
         app: mysql
     spec:
+      nodeSelector:
+        cputype: arm
       volumes:
         - name: mysql-storage
           persistentVolumeClaim:
