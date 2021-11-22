@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
             - name: glasgow-bin-collection
-              image: gsdevme/glasgow-bin-collection-mqtt:1.0.0
+              image: gsdevme/glasgow-bin-collection-mqtt:latest
               imagePullPolicy: IfNotPresent
               envFrom:
                 - configMapRef:
