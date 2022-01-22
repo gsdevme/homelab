@@ -21,7 +21,7 @@ spec:
             requests:
               cpu: "200m"
               memory: "128Mi"
-          image: esphome/esphome:1.15.3
+          image: esphome/esphome:2022.1.0
           imagePullPolicy: Always
           ports:
             - containerPort: 6052
