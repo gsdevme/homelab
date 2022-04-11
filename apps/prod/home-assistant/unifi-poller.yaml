@@ -24,6 +24,14 @@ spec:
       labels:
         app: unifi-ha-presence
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values: ["amd64"]
       containers:
         - name: unifi-ha-presence
           imagePullPolicy: IfNotPresent
