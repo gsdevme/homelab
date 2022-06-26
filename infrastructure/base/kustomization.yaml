@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - sources
-  - kubernetes-secret-generator
+  #- kubernetes-secret-generator
   - cert-manager
   - nginx
   - letsencrypt
-  - longhorn
+  #- longhorn
