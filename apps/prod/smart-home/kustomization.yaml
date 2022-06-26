@@ -1,4 +1,4 @@
-namespace: home-assistant
+namespace: smart-home
 resources:
   - namespace.yaml
   - home-assistant.yaml
