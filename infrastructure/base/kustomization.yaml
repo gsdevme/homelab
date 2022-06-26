@@ -4,5 +4,5 @@ resources:
   - sources
   - cert-manager
   - nginx
-  - letsencrypt
+  #- letsencrypt
   #- longhorn
