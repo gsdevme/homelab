@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solis-cloud
+data:
+  SOLIS_STATION_ID: "1298491919448736814"
+  MQTT_HOST: "mqtt://mqtt.home.gsdev.me"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solis-cloud
+  labels:
+    app: solis-cloud
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: solis-cloud
+  template:
+    metadata:
+      labels:
+        app: solis-cloud
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values: ["arm64"]
+      containers:
+        - name: solis-cloud
+          imagePullPolicy: IfNotPresent
+          image: gsdevme/solis-cloud-mqtt:latest
+          envFrom:
+            - configMapRef:
+                name: solis-cloud
+            - secretRef:
+                name: solis-cloud
+          resources:
+            limits:
+              memory: "1024Mi"
+              cpu: "1000m"
+            requests:
+              memory: "1024Mi"
+              cpu: "1000m"
