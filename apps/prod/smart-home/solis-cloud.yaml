@@ -34,7 +34,7 @@ spec:
       containers:
         - name: solis-cloud
           imagePullPolicy: IfNotPresent
-          image: gsdevme/solis-cloud-mqtt:v1.3.0
+          image: gsdevme/solis-cloud-mqtt:v1.4.0
           envFrom:
             - configMapRef:
                 name: solis-cloud
