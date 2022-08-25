@@ -5,7 +5,7 @@ metadata:
 data:
   TRACK_DEVICES: "Ceilidhs-Phone,iPhone-X"
   UNIFI_HOST: "https://172.16.16.1"
-  MQTT_DNS: "mqtt://172.16.16.254:1883"
+  MQTT_DNS: "mqtt://mqtt.home.gsdev.me:1883"
 ---
 apiVersion: apps/v1
 kind: Deployment
