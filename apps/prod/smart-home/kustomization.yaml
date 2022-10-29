@@ -3,4 +3,4 @@ resources:
   - namespace.yaml
   - home-assistant.yaml
   - unifi-poller.yaml
-  - solis-cloud.yaml
+  #- solis-cloud.yaml
