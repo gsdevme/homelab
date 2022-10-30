@@ -5,7 +5,7 @@ metadata:
 data:
   MQTT_SERVER: "mqtt.home.gsdev.me"
   MQTT_TOPIC: "solis/metrics"
-  DEBUG: "true"
+  DEBUG: "false"
 ---
 apiVersion: apps/v1
 kind: Deployment
