@@ -3,9 +3,9 @@ kind: ConfigMap
 metadata:
   name: solismon3
 data:
-  MQTT_HOST: "mqtt.home.gsdev.me"
+  MQTT_SERVER: "mqtt.home.gsdev.me"
   MQTT_TOPIC: "solis/metrics"
-  DEBUG: "false"
+  DEBUG: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
