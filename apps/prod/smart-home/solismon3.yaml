@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solismon3
+data:
+  MQTT_HOST: "mqtt.home.gsdev.me"
+  MQTT_TOPIC: "solis/metrics"
+  DEBUG: "false"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solismon3
+  labels:
+    app: solismon3
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: solismon3
+  template:
+    metadata:
+      labels:
+        app: solismon3
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values: ["arm64"]
+      containers:
+        - name: solismon3
+          imagePullPolicy: IfNotPresent
+          image: gsdevme/solismon3:1.0.0
+          envFrom:
+            - configMapRef:
+                name: solismon3
+            - secretRef:
+                name: solismon3
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
