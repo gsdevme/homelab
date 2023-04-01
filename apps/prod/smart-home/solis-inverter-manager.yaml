@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: solis-inverter-manager
+data:
+  MQTT_SERVER: "mqtt.home.gsdev.me"
+  DEBUG: "false"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: solis-inverter-manager
+  labels:
+    app: solis-inverter-manager
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: solis-inverter-manager
+  template:
+    metadata:
+      labels:
+        app: solis-inverter-manager
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values: ["arm64"]
+      containers:
+        - name: solis-inverter-manager
+          imagePullPolicy: IfNotPresent
+          image: gsdevme/solis-inverter-manager:1.1.1
+          envFrom:
+            - configMapRef:
+                name: solis-inverter-manager
+            - secretRef:
+                name: solis-inverter-manager
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
