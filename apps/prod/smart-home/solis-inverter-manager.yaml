@@ -33,8 +33,8 @@ spec:
                     values: ["arm64"]
       containers:
         - name: solis-inverter-manager
-          imagePullPolicy: IfNotPresent
-          image: gsdevme/solis-inverter-manager:1.1.1
+          imagePullPolicy: Always
+          image: gsdevme/solis-inverter-manager:latest
           envFrom:
             - configMapRef:
                 name: solis-inverter-manager
