@@ -3,4 +3,5 @@ resources:
   - namespace.yaml
   - home-assistant.yaml
   - unifi-poller.yaml
+  - solis-inverter-manager.yaml
 #  - solismon3.yaml
