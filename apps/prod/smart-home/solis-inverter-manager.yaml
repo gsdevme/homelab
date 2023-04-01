@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: solis-inverter-manager
 data:
-  MQTT_SERVER: "mqtt.home.gsdev.me"
+  MQTT_HOST: "mqtt.home.gsdev.me"
   DEBUG: "false"
 ---
 apiVersion: apps/v1
