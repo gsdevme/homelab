@@ -4,7 +4,7 @@ metadata:
   name: solis-inverter-manager
 data:
   MQTT_HOST: "mqtt.home.gsdev.me"
-  DEBUG: "false"
+  DEBUG: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
