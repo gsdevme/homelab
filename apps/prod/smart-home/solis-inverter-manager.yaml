@@ -34,7 +34,7 @@ spec:
       containers:
         - name: solis-inverter-manager
           imagePullPolicy: IfNotPresent
-          image: gsdevme/solis-inverter-manager:v1.4.0
+          image: gsdevme/solis-inverter-manager:v1.4.1
           envFrom:
             - configMapRef:
                 name: solis-inverter-manager
