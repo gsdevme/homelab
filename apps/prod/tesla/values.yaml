@@ -1,0 +1,21 @@
+auth:
+  username: "teslamate"
+  database: "teslamate"
+  existingSecret: 'postgresql'
+  secretKeys:
+    adminPasswordKey: "DATABASE_ADMIN_PASSWORD"
+    userPasswordKey: "DATABASE_USER_PASSWORD"
+
+primary:
+  resources:
+    requests:
+      cpu: 2
+      memory: 1024Mi
+    limits:
+      cpu: 2
+      memory: 1024Mi
+  nodeSelector:
+    kubernetes.io/hostname: "pi-alpha"
+  persistence:
+    existingClaim: "local-volume-postgresql-pvc"
+    size: "25Gi"

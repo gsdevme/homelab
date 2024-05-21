@@ -1,0 +1,13 @@
+namespace: tesla
+resources:
+  - namespace.yaml
+  - storage.yaml
+  - pvc.yaml
+  - release.yaml
+  - teslamate.yaml
+configMapGenerator:
+  - name: postgresql-values
+    files:
+      - values.yaml=values.yaml
+configurations:
+  - kustomizeconfig.yaml
