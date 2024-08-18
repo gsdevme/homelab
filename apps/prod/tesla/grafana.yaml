@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teslamate-grafana
+  labels:
+    app: teslamate-grafana
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: teslamate-grafana
+  template:
+    metadata:
+      labels:
+        app: teslamate-grafana
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: "kubernetes.io/arch"
+                    operator: In
+                    values: ["arm64"]
+      containers:
+        - name: teslamate-grafana
+          ports:
+            - containerPort: 3000
+          imagePullPolicy: IfNotPresent
+          image: teslamate/grafana:1.29.1
+          envFrom:
+            - configMapRef:
+                name: teslamate
+            - secretRef:
+                name: teslamate
+          resources:
+            limits:
+              memory: "1000Mi"
+              cpu: "500m"
+            requests:
+              memory: "1000Mi"
+              cpu: "500m"

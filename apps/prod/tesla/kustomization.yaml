@@ -5,6 +5,7 @@ resources:
   - pvc.yaml
   - release.yaml
   - teslamate.yaml
+  - grafana.yaml
 configMapGenerator:
   - name: postgresql-values
     files:
