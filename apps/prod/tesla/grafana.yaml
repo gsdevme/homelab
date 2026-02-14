@@ -28,7 +28,7 @@ spec:
           ports:
             - containerPort: 3000
           imagePullPolicy: IfNotPresent
-          image: teslamate/grafana:1.31.0
+          image: teslamate/grafana:1.33.0
           envFrom:
             - configMapRef:
                 name: teslamate
