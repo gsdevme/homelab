@@ -1,3 +1,7 @@
+image:
+  # GOD DAMN Bitnami
+  repository: bitnamilegacy/postgresql
+
 auth:
   username: "teslamate"
   database: "teslamate"
