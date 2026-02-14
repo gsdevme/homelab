@@ -2,6 +2,6 @@ namespace: smart-home
 resources:
   - namespace.yaml
   - home-assistant.yaml
-  - unifi-poller.yaml
+#  - unifi-poller.yaml
   - solis-inverter-manager.yaml
 #  - solismon3.yaml
