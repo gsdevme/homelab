@@ -1,3 +1,10 @@
+# Bitnami charts >= 16.x hard-reject non-standard images (we use the
+# bitnamilegacy repo) unless image verification is explicitly disabled.
+# See bitnami/charts#30850.
+global:
+  security:
+    allowInsecureImages: true
+
 image:
   # GOD DAMN Bitnami
   repository: bitnamilegacy/postgresql
