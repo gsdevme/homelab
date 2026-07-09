@@ -28,7 +28,9 @@ do
   ssh root@$ip "apt-get install curl vim htop lm-sensors open-iscsi sudo -y"
 done
 
-EXTRA_ARGS="--write-kubeconfig-mode 0664 --disable traefik,servicelb local-storage --tls-san $KUBE_VIP"
+# Only traefik is disabled — servicelb (Klipper, backs the nginx LoadBalancer)
+# and local-storage (the local-path provisioner backing app PVCs) are kept.
+EXTRA_ARGS="--write-kubeconfig-mode 0664 --disable traefik --tls-san $KUBE_VIP"
 
 #k3sup install \
 # --ip $MASTER_ONE \
