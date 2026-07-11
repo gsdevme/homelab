@@ -83,7 +83,7 @@ spec:
                     values: ["arm64"]
       containers:
         - name: hyundai-bluelink-mqtt
-          image: ghcr.io/gsdevme/hyundai-bluelink-mqtt:v1.0.1
+          image: ghcr.io/gsdevme/hyundai-bluelink-mqtt:v1.1.0
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
