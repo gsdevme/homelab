@@ -5,3 +5,4 @@ resources:
 #  - unifi-poller.yaml
   - solis-inverter-manager.yaml
 #  - solismon3.yaml
+  - hyundai-bluelink-mqtt.yaml
