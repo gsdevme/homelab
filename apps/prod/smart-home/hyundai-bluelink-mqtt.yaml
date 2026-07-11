@@ -8,6 +8,7 @@ data:
   TOKEN_STORE: "kube"
   TOKEN_SECRET_NAME: "hyundai-bluelink-mqtt-token"
   HEALTH_ADDR: ":8080"
+  DISTANCE_UNIT: "mi"
   # defaults left unset: POLL_INTERVAL(45m), MQTT_TOPIC_PREFIX(hyundai_bluelink),
   # HA_DISCOVERY_PREFIX(homeassistant), LOG_FORMAT(json). BLUELINK_VIN/PIN only if needed.
 ---
