@@ -18,18 +18,10 @@ spec:
       retries: 3
   values:
     controller:
-      # Pinned to the control-plane node while the pi-gamma flannel/host-local
-      # IPAM leak is unresolved and the arm64 agents are cordoned. This keeps the
-      # controller and the admission-webhook hook Jobs on a node with free pod IPs.
-      # REVISIT before Phase 3: pinning the controller to the single control-plane
-      # node means ingress is briefly down when kube-master drains for its own
-      # k3s upgrade (expected for a single-server control plane, but be aware).
-      nodeSelector:
-        kubernetes.io/hostname: kube-master
-      admissionWebhooks:
-        patch:
-          nodeSelector:
-            kubernetes.io/hostname: kube-master
+      # Un-pinned for Phase 3 (k3s upgrade): the pi-gamma host-local IPAM leak is
+      # resolved and all agents allocate pod IPs, so the controller no longer needs
+      # to be tied to kube-master. Leaving it schedulable lets it ride out
+      # kube-master's own k3s upgrade on an agent instead of going down with it.
       service:
         type: LoadBalancer
         externalTrafficPolicy: Local
