@@ -18,19 +18,11 @@ spec:
       retries: 3
   values:
     controller:
-      # Pinned to the control-plane node. The pi-gamma host-local IPAM leak is
-      # NOT actually resolved: a brief un-pin (a8c331e) showed pi-gamma's
-      # 10.42.3.0/24 is still exhausted ("no IP addresses available in range
-      # set") despite only ~8 pods, so the admission-webhook hook Job could not
-      # get a pod IP there. Keep the controller + patch Job on kube-master (free
-      # IPs) until pi-gamma's /var/lib/cni/networks/cbr0 is cleared at the node
-      # level. REVISIT / un-pin only once that leak is genuinely fixed.
-      nodeSelector:
-        kubernetes.io/hostname: kube-master
-      admissionWebhooks:
-        patch:
-          nodeSelector:
-            kubernetes.io/hostname: kube-master
+      # Un-pinned for Phase 3. The pi-gamma host-local IPAM leak that forced the
+      # earlier pin was cleared at the node level (rm /var/lib/cni/networks/cbr0
+      # + k3s-agent restart); all agents now allocate pod IPs (verified with a
+      # 40-pod fill test). Leaving the controller schedulable lets it ride out
+      # kube-master's own k3s upgrade on an agent instead of going down with it.
       service:
         type: LoadBalancer
         externalTrafficPolicy: Local
