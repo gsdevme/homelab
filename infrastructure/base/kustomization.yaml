@@ -5,4 +5,5 @@ resources:
   - cert-manager
   - nginx
   - letsencrypt
+  - system-upgrade-controller
   #- longhorn

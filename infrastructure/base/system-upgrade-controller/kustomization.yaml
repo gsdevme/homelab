@@ -1,0 +1,18 @@
+# Rancher system-upgrade-controller (SUC).
+#
+# Drives declarative k3s upgrades via Plan CRDs (upgrade.cattle.io). The
+# controller itself is inert until a Plan is created, so deploying it is safe.
+#
+# crd.yaml and controller.yaml are vendored UNMODIFIED from the upstream release
+# so they can be re-pulled on a version bump. To update, bump the tag below and
+# re-download both assets:
+#   TAG=v0.19.2
+#   curl -fsSLO https://github.com/rancher/system-upgrade-controller/releases/download/$TAG/crd.yaml
+#   curl -fsSLO https://github.com/rancher/system-upgrade-controller/releases/download/$TAG/system-upgrade-controller.yaml  # -> controller.yaml
+#
+# Pinned version: v0.19.2 (controller image: rancher/system-upgrade-controller:v0.19.2)
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - crd.yaml
+  - controller.yaml
