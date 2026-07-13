@@ -1,0 +1,27 @@
+# k3s server (control-plane) upgrade Plan.
+#
+# Targets the single control-plane node (kube-master), which carries embedded
+# etcd, via the node-role.kubernetes.io/control-plane=true label. SUC upgrades
+# servers before agents. `version:` is the declarative knob: bump it (in lockstep
+# with agent-plan.yaml) one minor at a time and commit to trigger each hop.
+#
+# Journey: v1.26.15 -> v1.27.16 -> v1.28.x -> v1.29.x -> v1.30.x (+k3s1).
+# Confirm the exact latest +k3s1 patch per minor from the k3s v1.<minor> channel
+# (https://update.k3s.io/v1-release/channels) before each hop.
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: server-plan
+  namespace: system-upgrade
+spec:
+  concurrency: 1
+  cordon: true
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: In
+        values: ["true"]
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+  version: "v1.27.16+k3s1"

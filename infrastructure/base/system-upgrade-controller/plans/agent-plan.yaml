@@ -1,0 +1,33 @@
+# k3s agent (worker) upgrade Plan.
+#
+# Targets the arm64 Pi agents (everything WITHOUT the control-plane label). The
+# `prepare` step blocks each agent until server-plan has completed, so the
+# control-plane always upgrades first. Keep `version:` in lockstep with
+# server-plan.yaml.
+#
+# drain.force evicts pods (incl. tesla postgres on local-path, node-pinned) so
+# the node can reboot into the new k3s binary; skipWaitForDeleteTimeout avoids
+# hanging on pods stuck terminating. concurrency 1 => one Pi at a time.
+apiVersion: upgrade.cattle.io/v1
+kind: Plan
+metadata:
+  name: agent-plan
+  namespace: system-upgrade
+spec:
+  concurrency: 1
+  cordon: true
+  drain:
+    force: true
+    skipWaitForDeleteTimeout: 60
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: NotIn
+        values: ["true"]
+  prepare:
+    image: rancher/k3s-upgrade
+    args: ["prepare", "server-plan"]
+  serviceAccountName: system-upgrade
+  upgrade:
+    image: rancher/k3s-upgrade
+  version: "v1.27.16+k3s1"

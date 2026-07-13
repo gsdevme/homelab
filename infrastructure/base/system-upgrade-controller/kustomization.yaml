@@ -16,3 +16,7 @@ kind: Kustomization
 resources:
   - crd.yaml
   - controller.yaml
+  # k3s upgrade Plans. NOTE: these are LIVE — once applied, SUC drives a rolling
+  # k3s upgrade to each Plan's `version:`. Bump both versions one minor per hop.
+  - plans/server-plan.yaml
+  - plans/agent-plan.yaml
