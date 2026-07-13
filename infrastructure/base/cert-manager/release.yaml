@@ -11,10 +11,14 @@ spec:
         kind: HelmRepository
         name: jetstack
         namespace: flux-system
-      version: "1.8.2"
+      version: "1.16.5"
   interval: 1h0m0s
   install:
     remediation:
       retries: 3
   values:
-    installCRDs: true
+    # v1.15+ replaced `installCRDs` with the `crds` block. keep=true retains the
+    # CRDs (and issued certs) if the release is ever removed.
+    crds:
+      enabled: true
+      keep: true
