@@ -19,6 +19,10 @@ spec:
   values:
     # v1.15+ replaced `installCRDs` with the `crds` block. keep=true retains the
     # CRDs (and issued certs) if the release is ever removed.
+    # installCRDs must be explicitly false: Flux 2.0's helm-controller carries the
+    # previous release's `installCRDs: true` into the upgrade, and the chart errors
+    # if both installCRDs and crds.enabled are set. (Removable once Flux is bumped.)
+    installCRDs: false
     crds:
       enabled: true
       keep: true
