@@ -5,7 +5,9 @@ metadata:
 data:
   UNIFI_HOST: "https://172.16.16.1"
   MQTT_BROKER_URL: "mqtt://mqtt.home.gsdev.me:1883"
-  TRACK_DEVICES: "Ceilidhs-Phone,iPhone-X"
+  # Matched as case-insensitive substrings against client name or MAC. Names are used
+  # rather than MACs deliberately: phones rotate MACs (private Wi-Fi addresses).
+  TRACK_DEVICES: "Ceilidhs-Phone,iPhone-X,Jim-s-S24,iPhone"
   HEALTH_ADDR: ":8080"
   # defaults left unset: UNIFI_SITE(default), POLL_INTERVAL(10s), FAILURE_THRESHOLD(5),
   # READY_FAILURE_THRESHOLD(3), MQTT_TOPIC_PREFIX(unifi), HA_DISCOVERY_PREFIX(homeassistant),
