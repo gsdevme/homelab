@@ -3,9 +3,13 @@ kind: ConfigMap
 metadata:
   name: unifi-ha-presence
 data:
-  TRACK_DEVICES: "Ceilidhs-Phone,iPhone-X"
   UNIFI_HOST: "https://172.16.16.1"
-  MQTT_DNS: "mqtt://mqtt.home.gsdev.me:1883"
+  MQTT_BROKER_URL: "mqtt://mqtt.home.gsdev.me:1883"
+  TRACK_DEVICES: "Ceilidhs-Phone,iPhone-X"
+  HEALTH_ADDR: ":8080"
+  # defaults left unset: UNIFI_SITE(default), POLL_INTERVAL(10s), FAILURE_THRESHOLD(5),
+  # READY_FAILURE_THRESHOLD(3), MQTT_TOPIC_PREFIX(unifi), HA_DISCOVERY_PREFIX(homeassistant),
+  # LOG_LEVEL(info), LOG_FORMAT(json). ~50s to flip a device to not_home.
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -16,6 +20,8 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 2
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: unifi-ha-presence
@@ -24,24 +30,52 @@ spec:
       labels:
         app: unifi-ha-presence
     spec:
+      terminationGracePeriodSeconds: 30
       affinity:
         nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: "kubernetes.io/arch"
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/arch
                     operator: In
-                    values: ["amd64"]
+                    values: ["arm64"]
       containers:
         - name: unifi-ha-presence
+          image: ghcr.io/gsdevme/unifi-ha-presence-mqtt:v2.0.0
           imagePullPolicy: IfNotPresent
-          image: gsdevme/unifi-ha-presence-mqtt:v1.2.1
           envFrom:
             - configMapRef:
                 name: unifi-ha-presence
             - secretRef:
                 name: unifi-ha-presence
+          ports:
+            - containerPort: 8080
+              name: health
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 10
           resources:
             limits:
-              memory: "32Mi"
-              cpu: "50m"
+              memory: "64Mi"
+              cpu: "100m"
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
