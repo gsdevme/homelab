@@ -52,6 +52,7 @@ spec:
       # Add a namespace here when an app in it needs a OnePasswordItem.
       watchNamespace:
         - default
+        - wealthfolio
       # Global true means editing any item in the vault can restart unrelated
       # workloads. Opt in per workload with the annotation
       # operator.1password.io/auto-restart: "true".
