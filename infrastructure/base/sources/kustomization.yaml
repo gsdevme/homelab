@@ -10,3 +10,4 @@ resources:
   - bitnami.yaml
   - minio.yaml
   - longhorn.yaml
+  - onepassword.yaml
