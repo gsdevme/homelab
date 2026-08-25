@@ -1,0 +1,72 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: onepassword
+spec:
+  releaseName: onepassword
+  chart:
+    spec:
+      chart: connect
+      sourceRef:
+        kind: HelmRepository
+        name: onepassword
+        namespace: flux-system
+      version: "2.4.1"
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+    # Flux defaults upgrade.crds to Skip. The chart ships the OnePasswordItem CRD in
+    # its crds/ dir, so a future chart bump would silently leave the CRD schema stale.
+    crds: Create
+  upgrade:
+    crds: CreateReplace
+  values:
+    # Operator-only. The self-hosted Connect server would add two more pods and two
+    # more images to patch; the operator talks to the 1Password API directly using a
+    # service account token.
+    connect:
+      create: false
+    operator:
+      create: true
+      authMethod: service-account
+      # Bootstrap (manual, once per cluster - the operator cannot supply its own
+      # token):
+      #   kubectl -n onepassword create secret generic \
+      #     onepassword-service-account-token \
+      #     --from-literal=token="$(op read op://<vault>/homelab-k8s/credential)"
+      # The token must live in a vault the service account itself cannot read.
+      # Never set
+      # serviceAccountToken.value here - it renders the literal token into a
+      # Secret, and this is a public repo.
+      serviceAccountToken:
+        name: onepassword-service-account-token
+        key: token
+      # Explicit list, NOT []. An empty list binds the operator's ServiceAccount to a
+      # ClusterRoleBinding with read/write on secrets cluster-wide - including
+      # flux-system (git deploy key) and cert-manager (issued private keys). A
+      # non-empty list binds a ClusterRole via a per-namespace RoleBinding instead.
+      # Add a namespace here when an app in it needs a OnePasswordItem.
+      watchNamespace:
+        - default
+      # Global true means editing any item in the vault can restart unrelated
+      # workloads. Opt in per workload with the annotation
+      # operator.1password.io/auto-restart: "true".
+      autoRestart: false
+      pollingInterval: 600
+      resources:
+        requests:
+          memory: "128Mi"
+          cpu: "100m"
+        limits:
+          memory: "128Mi"
+          cpu: "100m"
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values: ["arm64"]

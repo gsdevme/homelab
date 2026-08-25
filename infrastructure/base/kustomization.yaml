@@ -6,4 +6,5 @@ resources:
   - nginx
   - letsencrypt
   - system-upgrade-controller
+  - onepassword
   #- longhorn
