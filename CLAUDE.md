@@ -15,7 +15,7 @@ A Flux v2 GitOps monorepo for a personal Kubernetes homelab. Cluster state is de
 - `infrastructure/` — core services (cert-manager, nginx ingress, longhorn, etc.). `base/` + per-cluster overlays. `infrastructure/base/sources/` defines Flux `HelmRepository` CRDs (the chart repos everything pulls from).
 - `k3sup/home-cluster/install.sh` — one-off cluster bootstrap (k3s via k3sup). The actual `k3sup install`/`join` commands are **commented out**, so it's a historical record, not run on deploys. It disables only k3s's built-in `traefik` (nginx-ingress replaces it). k3s's **servicelb** (Klipper — `svclb-*` pods back the nginx `LoadBalancer` Service) and **local-storage** (the default `local-path` StorageClass / `rancher.io/local-path` provisioner, which backs the app PVCs — e.g. tesla's) are **kept**. longhorn is defined but commented out of the infra allow-list, so it is not running.
 
-> `README.md` is stale — it describes an older multi-cluster layout (`clusters/prod`, `raspberry-pi-cluster`, drone sources, etc.) that no longer exists. Trust the actual tree and this file over it.
+> `README.md` is the human-facing overview of the same ground this file covers, plus the 1Password secrets workflow. It was rewritten in `524d29f`; the stale directory tree it used to carry is gone. Still trust the actual tree over any prose if they disagree.
 
 ## How deployment works (Flux DAG)
 
