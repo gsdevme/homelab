@@ -1,0 +1,34 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wealthfolio-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    # nginx basic auth sits in front of wealthfolio's own Argon2id login. Two
+    # independent credentials, so scanners and any pre-auth bug in the Axum
+    # server never reach the app. cert-manager's HTTP-01 solver gets its own
+    # Ingress without these annotations, so ACME still validates.
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: wealthfolio-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Wealthfolio"
+spec:
+  # ingressClassName, not the kubernetes.io/ingress.class annotation the older
+  # ingresses here use: that annotation is deprecated in ingress-nginx v1.14, and
+  # because IngressClass nginx is not the default one of the two is mandatory or
+  # this Ingress is silently never served.
+  ingressClassName: nginx
+  rules:
+    - host: wealthfolio.home.gsdev.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wealthfolio
+                port:
+                  number: 8088
+  tls:
+    - hosts:
+        - wealthfolio.home.gsdev.me
+      secretName: wealthfolio-home-gsdev-me-tls

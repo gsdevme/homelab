@@ -1,0 +1,9 @@
+# Dedicated class purely so reclaimPolicy can be Retain: the default local-path
+# class Deletes, and this volume holds the only copy of the finance database.
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: wealthfolio-local-path
+provisioner: rancher.io/local-path
+volumeBindingMode: WaitForFirstConsumer
+reclaimPolicy: Retain

@@ -1,0 +1,15 @@
+# local-path pins this to whichever node the pod first schedules onto. That node's
+# disk dying loses the DB, and while it is down wealthfolio cannot start at all.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wealthfolio-data
+  annotations:
+    volumeType: local
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: wealthfolio-local-path
+  resources:
+    requests:
+      storage: 5Gi

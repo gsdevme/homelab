@@ -1,0 +1,148 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wealthfolio
+data:
+  WF_LISTEN_ADDR: "0.0.0.0:8088"
+  # Matches the image's own VOLUME /data and its WF_DB_PATH default; stated
+  # explicitly so a change of image default cannot silently relocate the DB.
+  WF_DB_PATH: "/data/wealthfolio.db"
+  # Required whenever auth is enabled, and must be the public origin exactly.
+  WF_CORS_ALLOW_ORIGINS: "https://wealthfolio.home.gsdev.me"
+  WF_AUTH_TOKEN_TTL_MINUTES: "60"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wealthfolio
+  labels:
+    app: wealthfolio
+  annotations:
+    # Rotating WF_AUTH_PASSWORD_HASH in 1Password only takes effect if the pod
+    # restarts; the operator's global autoRestart is off, so opt in here.
+    operator.1password.io/auto-restart: "true"
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  # Recreate is mandatory, not stylistic: a RollingUpdate would deadlock waiting
+  # for the RWO volume, and if it did not, two processes would share one SQLite
+  # file.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: wealthfolio
+  template:
+    metadata:
+      labels:
+        app: wealthfolio
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        # The image runs as 1000:1000; fsGroup is what lets it write the
+        # freshly provisioned local-path directory.
+        fsGroup: 1000
+      affinity:
+        nodeAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values: ["arm64"]
+      containers:
+        - name: wealthfolio
+          # Upstream tags this release 3.7.0 — no leading v. Multi-arch, arm64 included.
+          image: wealthfolio/wealthfolio:3.7.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: wealthfolio
+          # Explicit secretKeyRefs rather than envFrom: a stray field added to the
+          # 1Password item can then never turn into an env var here.
+          env:
+            - name: WF_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wealthfolio
+                  key: WF_SECRET_KEY
+            - name: WF_AUTH_PASSWORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: wealthfolio
+                  key: WF_AUTH_PASSWORD_HASH
+          ports:
+            - containerPort: 8088
+              name: http
+          # Generous startup budget: first boot runs the SQLite migrations before
+          # the listener answers. 5s x 60 = up to 5 minutes.
+          startupProbe:
+            httpGet:
+              path: /api/v1/healthz
+              port: 8088
+            periodSeconds: 5
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /api/v1/healthz
+              port: 8088
+            periodSeconds: 30
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/healthz
+              port: 8088
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              # 512Mi is upstream's own ceiling; requests == limits on memory per
+              # repo convention. CPU is deliberately unequal — the onepassword
+              # operator taught us a hard 100m cap can throttle startup into a
+              # crash-loop. Measure with `kubectl top` and tighten if the burst
+              # turns out to be small.
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "1000m"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: wealthfolio-data
+        # Required by readOnlyRootFilesystem — upstream runs the container
+        # read_only with exactly this tmpfs.
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wealthfolio
+  labels:
+    app: wealthfolio
+spec:
+  type: ClusterIP
+  selector:
+    app: wealthfolio
+  ports:
+    - name: http
+      port: 8088
+      targetPort: 8088

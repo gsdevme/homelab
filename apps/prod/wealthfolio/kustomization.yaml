@@ -1,0 +1,8 @@
+namespace: wealthfolio
+resources:
+  - namespace.yaml
+  - onepassword.yaml
+  - storage.yaml
+  - pvc.yaml
+  - deployment.yaml
+  - ingress.yaml
