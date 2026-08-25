@@ -36,6 +36,9 @@ spec:
       #     onepassword-service-account-token \
       #     --from-literal=token="$(op read op://<vault>/homelab-k8s/credential)"
       # The token must live in a vault the service account itself cannot read.
+      # It carries a 90-day expiry (1Password's maximum), so it needs rotating
+      # roughly quarterly. Expiry is silent: existing Secrets keep working and
+      # only reconciliation stops, so nothing here will alert you.
       # Never set
       # serviceAccountToken.value here - it renders the literal token into a
       # Secret, and this is a public repo.
