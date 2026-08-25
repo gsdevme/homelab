@@ -6,3 +6,4 @@ resources:
   - solis-inverter-manager.yaml
 #  - solismon3.yaml
   - hyundai-bluelink-mqtt.yaml
+  - trading212-mqtt.yaml
