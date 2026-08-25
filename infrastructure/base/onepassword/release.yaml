@@ -54,13 +54,22 @@ spec:
       # operator.1password.io/auto-restart: "true".
       autoRestart: false
       pollingInterval: 600
+      # Deliberately NOT requests == limits on cpu, unlike the rest of this repo.
+      # Measured on pi-gamma: this operator burns ~680m for ~20s of startup
+      # (controller-runtime cache warmup) and then idles at ~2m. A hard 100m cpu
+      # limit throttles startup so hard the :8081 health endpoint misses its
+      # 1s probe timeout, and the pod crash-loops before it can ever go ready.
+      # Requesting the idle figure while allowing the burst avoids reserving a
+      # whole core on a 4-core Pi for a process that idles at 2m.
+      # Memory is stable, so requests == limits there; 128Mi was too tight
+      # (observed 120Mi steady state).
       resources:
         requests:
-          memory: "128Mi"
+          memory: "256Mi"
           cpu: "100m"
         limits:
-          memory: "128Mi"
-          cpu: "100m"
+          memory: "256Mi"
+          cpu: "1000m"
       affinity:
         nodeAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
