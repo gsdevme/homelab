@@ -1,60 +1,72 @@
 # Homelab Monorepo
 
+A [Flux v2](https://fluxcd.io/) GitOps monorepo for a personal Kubernetes homelab.
+Cluster state is declared here and reconciled automatically — there is no manual
+`kubectl apply` in the normal workflow. **Editing manifests and committing to
+`master` is the deploy mechanism**; Flux syncs roughly every 10 minutes.
+
+One live cluster, `home`: a k3s cluster of four nodes — an amd64 control-plane and
+three arm64 Raspberry Pis. Workloads that must land on a Pi use `arm64` node affinity
+or a nodeSelector.
+
+## Layout
+
+| Path | What it holds |
+|---|---|
+| `clusters/home/` | The Flux entrypoint — controllers, the `GitRepository` source, and the `Kustomization` CRDs that wire cluster to repo paths. |
+| `apps/` | Application workloads. `prod/` is deployed; `base/` and `no-deployment/` are not. |
+| `infrastructure/` | Core services — cert-manager, nginx ingress, letsencrypt, the 1Password operator, the k3s upgrade controller. |
+| `infrastructure/base/sources/` | Flux `HelmRepository` CRDs — the chart repos everything else pulls from. |
+
+## How it deploys
+
+`clusters/home/` defines two Flux `Kustomization`s, both with `prune: true`, ordered
+by an explicit `dependsOn`:
+
 ```
-apps
-├── base
-│   └── smokeping
-│       ├── config.yaml
-│       ├── kustomization.yaml
-│       ├── namespace.yaml
-│       └── statefulset.yaml
-└── raspberry-pi-cluster
-    └── smokeping
-        ├── ingress.yaml
-        ├── kustomization.yaml
-        └── statefulset.yaml
-clusters
-├── prod
-│   ├── flux-system
-│   └── infrastructure.yaml
-└── raspberry-pi-cluster
-    ├── apps.yaml
-    ├── flux-system
-    └── infrastructure.yaml
-infrastructure
-├── base
-│   ├── cert-manager
-│   │   ├── kustomization.yaml
-│   │   ├── namespace.yaml
-│   │   └── release.yaml
-│   ├── kubernetes-secret-generator
-│   │   ├── kustomization.yaml
-│   │   ├── namespace.yaml
-│   │   └── release.yaml
-│   ├── kustomization.yaml
-│   ├── longhorn
-│   │   ├── kustomization.yaml
-│   │   ├── namespace.yaml
-│   │   └── release.yaml
-│   ├── nginx
-│   │   ├── kustomization.yaml
-│   │   ├── namespace.yaml
-│   │   └── release.yaml
-│   └── sources
-│       ├── influxdata.yaml
-│       ├── jetstack.yaml
-│       ├── kustomization.yaml
-│       ├── longhorn.yaml
-│       ├── mittwald.yaml
-│       ├── nginx.yaml
-│       └── prometheus.yaml
-├── prod
-│   ├── basic-auth.yaml
-│   ├── kustomization.yaml
-│   └── longhorn-ingress-value.yaml
-└── raspberry-pi-cluster
-    └── kustomization.yaml
+infrastructure  →  apps
 ```
+
+Each points at exactly one path — `./infrastructure/prod` and `./apps/prod` — and
+those two roots behave differently, which is the main thing to know before adding
+anything:
+
+- **`apps/prod/` has no root `kustomization.yaml`.** Flux recurses every subdirectory,
+  so creating a directory there is enough to make an app live.
+- **`infrastructure/base/kustomization.yaml` is an explicit allow-list.** A component
+  only deploys if it is listed there. This is why `longhorn` exists in the tree but is
+  not running — it is commented out.
+
+Because infrastructure gates apps, a broken shared source or infra component will
+hold up app reconciliation too.
+
+Everything outside those two roots is inert: `apps/base/`, `apps/no-deployment/`,
+`infrastructure/raspberry-pi-cluster/`, and any base component missing from the
+allow-list.
+
+## Adding an app
+
+Each app directory is one namespace, and mixes three styles as needed: a Helm
+`HelmRelease` with the chart version pinned and values supplied through a
+`configMapGenerator`; plain `Deployment`/`Service`/`Ingress` manifests; or both.
+
+1. Create `apps/prod/<app>/` with a `namespace.yaml` and your manifests.
+2. List everything in a `kustomization.yaml` and set `namespace:`.
+3. Commit. Flux does the rest.
+
+For infrastructure, add the component to `infrastructure/base/kustomization.yaml` as
+well — otherwise it deploys nothing.
+
+### Conventions
+
+- Ingress: `kubernetes.io/ingress.class: nginx`, with
+  `cert-manager.io/cluster-issuer: letsencrypt-prod` for TLS.
+- Pin Helm chart versions; declare the chart repo in `infrastructure/base/sources/`.
+- Set resource requests and limits, and `revisionHistoryLimit: 2`.
+- Never commit secrets — see below.
+
+There is no repo-wide build or test. Sanity-check a directory with
+`kustomize build <dir>` before committing; real validation happens in-cluster.
 
 ## Secrets (1Password operator)
 
