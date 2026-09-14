@@ -3,8 +3,25 @@ kind: ConfigMap
 metadata:
   name: solis-inverter-manager
 data:
-  MQTT_HOST: "mqtt.home.gsdev.me"
-  DEBUG: "true"
+  # Both containers envFrom this map. The sidecar ignores keys it does not know
+  # but has no default for MODE, so MODE must be set here explicitly.
+  MODE: "live"
+  # Solarman WiFi-stick datalogger on the IoT VLAN (Modbus over Solarman V5).
+  INVERTER_IP: "10.10.40.11"
+  INVERTER_PORT: "8899"
+  MQTT_BROKER_URL: "mqtt://mqtt.home.gsdev.me:1883"
+  HEALTH_ADDR: ":8080"
+  LOG_FORMAT: "json"
+  # TOU_WINDOW and the RTC drift check are interpreted in local time.
+  TZ: "Europe/London"
+  # INVARIANT: never set TOU_WINDOW to "" here. An empty ConfigMap value still counts
+  # as set and disables the time-of-use window assertion entirely; leave the key out
+  # to keep the default.
+  # defaults left unset: POLL_INTERVAL(60s), POLL_MAX_RETRIES(3), FAILURE_THRESHOLD(3),
+  # CONTROLS_ENABLED(true), TOU_WINDOW(23:30-05:30), RTC_SYNC_ENABLED(false),
+  # RTC_DRIFT_THRESHOLD(60s), MQTT_CLIENT_ID(solis-inverter-manager),
+  # MQTT_TOPIC_PREFIX(solis), HA_DISCOVERY_PREFIX(homeassistant),
+  # HA_OBJECT_ID_PREFIX(solis_inverter), INVERTER_SOCKET_TIMEOUT(10s), LOG_LEVEL(info).
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -15,6 +32,11 @@ metadata:
 spec:
   replicas: 1
   revisionHistoryLimit: 2
+  # Recreate, not RollingUpdate: two pods would briefly share MQTT_CLIENT_ID (the
+  # broker kicks one off) and both sidecars would open a Modbus socket to the one
+  # datalogger, which only serves a single client.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app: solis-inverter-manager
@@ -23,27 +45,111 @@ spec:
       labels:
         app: solis-inverter-manager
     spec:
+      # Stateless — nothing here needs the K8s API.
+      automountServiceAccountToken: false
+      # Covers the manager's graceful shutdown (drain scheduler, retained offline,
+      # clean broker disconnect; bounded by its own 5s shutdown context).
+      terminationGracePeriodSeconds: 30
       affinity:
         nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: "kubernetes.io/arch"
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              preference:
+                matchExpressions:
+                  - key: kubernetes.io/arch
                     operator: In
                     values: ["arm64"]
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      # No Service: the sidecar API is unauthenticated and writes inverter registers,
+      # so nothing beyond the pod's loopback may reach it. Use kubectl port-forward
+      # to read the manager's health endpoints.
       containers:
-        - name: solis-inverter-manager
+        - name: manager
+          image: ghcr.io/gsdevme/solis-inverter-manager:v2.0.0
           imagePullPolicy: IfNotPresent
-          image: gsdevme/solis-inverter-manager:v1.6.1
+          env:
+            # Topology, not config: the sidecar is the other container in this pod.
+            - name: SIDECAR_URL
+              value: "http://127.0.0.1:8081"
           envFrom:
             - configMapRef:
                 name: solis-inverter-manager
             - secretRef:
                 name: solis-inverter-manager
+          ports:
+            - containerPort: 8080
+              name: health
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 3
+          # /readyz (not the MQTT availability topic) is the readiness signal: it goes
+          # ready after the first fully successful poll and not-ready after
+          # FAILURE_THRESHOLD consecutive failures, which covers sidecar reachability.
+          # The availability topic's retained-offline Last Will lags on purpose.
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            failureThreshold: 10
           resources:
             limits:
-              memory: "256Mi"
-              cpu: "1000m"
+              memory: "128Mi"
+              cpu: "100m"
             requests:
-              memory: "256Mi"
-              cpu: "1000m"
+              memory: "128Mi"
+              cpu: "100m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+        - name: sidecar
+          image: ghcr.io/gsdevme/solis-inverter-manager-sidecar:v2.0.0
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: solis-inverter-manager
+            - secretRef:
+                name: solis-inverter-manager
+          ports:
+            - containerPort: 8081
+              name: sidecar
+          # Liveness only; the manager's /readyz is the pod's aggregate readiness.
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65532
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        # Scratch space for Python with the root filesystem read-only.
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 64Mi
