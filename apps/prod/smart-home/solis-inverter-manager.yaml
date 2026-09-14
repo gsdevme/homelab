@@ -21,7 +21,8 @@ data:
   # CONTROLS_ENABLED(true), TOU_WINDOW(23:30-05:30), RTC_SYNC_ENABLED(false),
   # RTC_DRIFT_THRESHOLD(60s), MQTT_CLIENT_ID(solis-inverter-manager),
   # MQTT_TOPIC_PREFIX(solis), HA_DISCOVERY_PREFIX(homeassistant),
-  # HA_OBJECT_ID_PREFIX(solis_inverter), INVERTER_SOCKET_TIMEOUT(10s), LOG_LEVEL(info).
+  # HA_OBJECT_ID_PREFIX(solis_inverter), INVERTER_SOCKET_TIMEOUT(10s), LOG_LEVEL(info),
+  # SIDECAR_STARTUP_TIMEOUT(30s).
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -67,7 +68,7 @@ spec:
       # to read the manager's health endpoints.
       containers:
         - name: manager
-          image: ghcr.io/gsdevme/solis-inverter-manager:v2.0.1
+          image: ghcr.io/gsdevme/solis-inverter-manager:v2.1.0
           imagePullPolicy: IfNotPresent
           env:
             # Topology, not config: the sidecar is the other container in this pod.
@@ -113,7 +114,7 @@ spec:
             capabilities:
               drop: ["ALL"]
         - name: sidecar
-          image: ghcr.io/gsdevme/solis-inverter-manager-sidecar:v2.0.1
+          image: ghcr.io/gsdevme/solis-inverter-manager-sidecar:v2.1.0
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
