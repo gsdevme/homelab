@@ -124,11 +124,18 @@ spec:
             - containerPort: 8081
               name: sidecar
           # Liveness only; the manager's /readyz is the pod's aggregate readiness.
+          # /health performs a real Modbus read under the transport lock, so it
+          # can wait behind an in-flight poll for up to INVERTER_SOCKET_TIMEOUT
+          # (10s) and then spend up to another 10s on its own read. The kubelet
+          # default of 1s dropped the socket mid-response and left a broken-pipe
+          # traceback in the sidecar log every probe cycle. 30s covers both
+          # timeouts back to back; three misses (3 min) before a restart.
           livenessProbe:
             httpGet:
               path: /health
               port: 8081
-            periodSeconds: 30
+            timeoutSeconds: 30
+            periodSeconds: 60
             failureThreshold: 3
           resources:
             limits:
