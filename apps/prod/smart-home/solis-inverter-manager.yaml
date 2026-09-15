@@ -68,7 +68,7 @@ spec:
       # to read the manager's health endpoints.
       containers:
         - name: manager
-          image: ghcr.io/gsdevme/solis-inverter-manager:v2.3.0
+          image: ghcr.io/gsdevme/solis-inverter-manager:v2.4.0
           imagePullPolicy: IfNotPresent
           env:
             # Topology, not config: the sidecar is the other container in this pod.
