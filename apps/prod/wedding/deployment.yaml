@@ -23,41 +23,54 @@ spec:
                   - key: "kubernetes.io/arch"
                     operator: In
                     values: ["amd64"]
+      # Nothing in the pod talks to the API server.
+      automountServiceAccountToken: false
+      securityContext:
+        # The nginx user in nginx-unprivileged.
+        runAsUser: 101
+        runAsGroup: 101
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
       containers:
-        - name: php
+        - name: web
           imagePullPolicy: Always
-          envFrom:
-            - secretRef:
-                name: wedding-secrets
+          image: ghcr.io/gsdevme/wedding-website:prod
           securityContext:
-            # www-data
-            runAsUser: 33
-            runAsNonRoot: true
             allowPrivilegeEscalation: false
-          image: gsdevme/wedding-website:prod
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          volumeMounts:
+            # nginx-unprivileged keeps its pid file and temp dirs under /tmp.
+            - name: tmp
+              mountPath: /tmp
           resources:
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: 200m
+              memory: 64Mi
             requests:
-              cpu: 500m
-              memory: 512Mi
-          livenessProbe:
-            exec:
-              command:
-                - echo
-                - -n
-                - >
-                - /dev/tcp/127.0.0.1/9000
-            initialDelaySeconds: 5
-            periodSeconds: 3
-          ports:
-            - containerPort: 9000
-        - name: nginx
-          imagePullPolicy: Always
-          image: gsdevme/wedding-website-assets:prod
+              cpu: 50m
+              memory: 32Mi
           ports:
             - containerPort: 8080
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /api/healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: tmp
+          emptyDir:
+            medium: Memory
+            sizeLimit: 16Mi
 ---
 apiVersion: v1
 kind: Service
@@ -68,12 +81,9 @@ spec:
   selector:
     app: wedding
   ports:
-    - port: 9000
-      targetPort: 9000
-      name: php
     - port: 80
-      targetPort: 8080
-      name: assets
+      targetPort: http
+      name: http
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -83,61 +93,19 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: 'nginx'
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/backend-protocol: "FCGI"
-    nginx.ingress.kubernetes.io/fastcgi-index: "index.php"
-    nginx.ingress.kubernetes.io/fastcgi-params-configmap: "wedding-config"
 spec:
   rules:
     - host: ceilidhandgavin.com
       http:
         paths:
-          - path: /robots.txt
-            pathType: Prefix
-            backend:
-              service:
-                name: svc-wedding
-                port:
-                  number: 80
-          - path: /favicon.ico
-            pathType: Prefix
-            backend:
-              service:
-                name: svc-wedding
-                port:
-                  number: 80
           - path: /
             pathType: Prefix
             backend:
               service:
                 name: svc-wedding
                 port:
-                  number: 9000
+                  number: 80
   tls:
     - hosts:
         - ceilidhandgavin.com
       secretName: wedding-tls
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  namespace: wedding
-  name: wedding-assets-ingress
-  annotations:
-    kubernetes.io/ingress.class: 'nginx'
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-spec:
-  rules:
-    - host: a.ceilidhandgavin.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: svc-wedding
-                port:
-                  number: 80
-  tls:
-    - hosts:
-        - a.ceilidhandgavin.com
-      secretName: wedding-assets-tls
