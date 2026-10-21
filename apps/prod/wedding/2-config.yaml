@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  namespace: wedding
-  name: wedding-config
-data:
-  SCRIPT_FILENAME: "/srv/app/public/index.php"
-  HTTP_PROXY: ""
