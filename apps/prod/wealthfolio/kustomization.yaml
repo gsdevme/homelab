@@ -8,3 +8,4 @@ resources:
   - ingress.yaml
   - middleware.yaml
   - ingress-traefik-preview.yaml
+  - certificate-dns01-staging.yaml
