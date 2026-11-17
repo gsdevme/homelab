@@ -85,7 +85,8 @@ ports:
       # Defence in depth: refuse non-RFC1918 clients even before the redirect.
       middlewares:
         - traefik-private-lan-only@kubernetescrd
-      # Plain HTTP only ever redirects to HTTPS (301, matches nginx).
+      # Plain HTTP only ever redirects to HTTPS, permanently (301), so clients
+      # remember the HTTPS URL.
       redirections:
         entryPoint:
           to: websecure
@@ -97,7 +98,8 @@ ports:
     hostPort: 443
     http:
       # lan-only first so non-LAN clients are rejected before anything else
-      # runs; then the nginx defaults every host had: compression and HSTS.
+      # runs; then, for every host, br/gzip compression to cut transfer size
+      # and HSTS so browsers refuse to downgrade to plain HTTP.
       middlewares:
         - traefik-private-lan-only@kubernetescrd
         - traefik-private-compress@kubernetescrd

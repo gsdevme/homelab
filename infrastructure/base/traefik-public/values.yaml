@@ -79,7 +79,8 @@ ports:
     # unprivileged container needs no NET_BIND_SERVICE.
     hostPort: 80
     http:
-      # Plain HTTP only ever redirects to HTTPS (301, matches nginx).
+      # Plain HTTP only ever redirects to HTTPS, permanently (301), so clients
+      # and search engines remember the HTTPS URL.
       redirections:
         entryPoint:
           to: websecure
@@ -90,7 +91,8 @@ ports:
     # Bound on the node itself (CNI portmap DNAT to the pod's 8443).
     hostPort: 443
     http:
-      # Preserve the nginx defaults every host had: compression and HSTS.
+      # Applied to every host: br/gzip compression to cut transfer size, and
+      # HSTS so browsers refuse to downgrade to plain HTTP.
       middlewares:
         - traefik-public-compress@kubernetescrd
         - traefik-public-hsts@kubernetescrd
