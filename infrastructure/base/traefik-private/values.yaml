@@ -78,8 +78,9 @@ ports:
     # Routers without explicit entrypoints attach only to web/websecure,
     # never to the internal traefik (8080) or metrics (9100) entrypoints.
     asDefault: true
-    # Test port while ingress-nginx still holds 80; becomes 80 at cut-over.
-    hostPort: 18080
+    # Bound on the node itself (CNI portmap DNAT to the pod's 8000), so the
+    # unprivileged container needs no NET_BIND_SERVICE.
+    hostPort: 80
     http:
       # Defence in depth: refuse non-RFC1918 clients even before the redirect.
       middlewares:
@@ -92,8 +93,8 @@ ports:
           permanent: true
   websecure:
     asDefault: true
-    # Test port while ingress-nginx still holds 443; becomes 443 at cut-over.
-    hostPort: 18443
+    # Bound on the node itself (CNI portmap DNAT to the pod's 8443).
+    hostPort: 443
     http:
       # lan-only first so non-LAN clients are rejected before anything else
       # runs; then the nginx defaults every host had: compression and HSTS.

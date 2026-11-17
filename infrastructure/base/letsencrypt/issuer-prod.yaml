@@ -17,4 +17,6 @@ spec:
       - selector: { }
         http01:
           ingress:
-            class: nginx
+            # Solver Ingresses must be served by the internet-facing instance:
+            # Let's Encrypt validates over port 80 from outside.
+            ingressClassName: traefik-public
