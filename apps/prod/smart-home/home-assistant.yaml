@@ -5,8 +5,18 @@ metadata:
 spec:
   type: ExternalName
   externalName: home-assistant.lan
+  # An ExternalName Service has no endpoints, so each controller picks the
+  # upstream port its own way: ingress-nginx dials targetPort (8123) behind
+  # port 80, Traefik dials the Service port itself. Port 8123 therefore has to
+  # exist as a Service port for Traefik. Both stay until the nginx Ingress is
+  # retired, then this collapses to the single 8123 port. Multi-port Services
+  # require every port to be named.
   ports:
-    - port: 80
+    - name: http
+      port: 80
+      targetPort: 8123
+    - name: http-8123
+      port: 8123
       targetPort: 8123
 ---
 apiVersion: networking.k8s.io/v1

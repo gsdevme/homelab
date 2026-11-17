@@ -1,0 +1,18 @@
+# Basic auth in front of wealthfolio's own Argon2id login: two independent
+# credentials, so scanners and any pre-auth bug in the app server never reach
+# it. Attached to the Ingress with the router.middlewares annotation.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: basic-auth
+  annotations:
+    # traefik-private's kubernetesCRD provider only loads objects carrying its
+    # class; without this the middleware is invisible and the router that
+    # references it is dropped (the host would 404, not go unauthenticated).
+    kubernetes.io/ingress.class: traefik-private
+spec:
+  basicAuth:
+    # Written by the wealthfolio-basic-auth OnePasswordItem: a single key
+    # holding one htpasswd line, which Traefik reads as the users list.
+    secret: wealthfolio-basic-auth
+    realm: Wealthfolio

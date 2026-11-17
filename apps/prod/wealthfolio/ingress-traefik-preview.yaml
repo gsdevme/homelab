@@ -1,0 +1,37 @@
+# TEMPORARY preview of wealthfolio through traefik-private on its test ports
+# (18080/18443) while ingress-nginx still serves 80/443. It is deleted when the
+# real Ingress in ingress.yaml switches class to traefik-private; until then
+# both Ingresses describe the same host and each controller serves only its own.
+#
+# Shape is final: what this Ingress says is what the real one will say, minus
+# the cert-manager annotation (the real one moves to the dns-01 issuer).
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wealthfolio-ingress-traefik-preview
+  annotations:
+    # Basic auth in front of wealthfolio's own login, replacing the three
+    # nginx auth-* annotations on the live Ingress. Format is
+    # <namespace>-<middleware name>@kubernetescrd; see middleware.yaml.
+    traefik.ingress.kubernetes.io/router.middlewares: wealthfolio-basic-auth@kubernetescrd
+  # No cert-manager.io/cluster-issuer: the live Ingress already owns the
+  # certificate, and a second issuer annotation would request a duplicate.
+spec:
+  ingressClassName: traefik-private
+  rules:
+    - host: wealthfolio.home.gsdev.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: wealthfolio
+                port:
+                  number: 8088
+  tls:
+    - hosts:
+        - wealthfolio.home.gsdev.me
+      # Reuse the certificate nginx serves today; cert-manager keeps renewing
+      # it through the live Ingress.
+      secretName: wealthfolio-home-gsdev-me-tls
