@@ -15,7 +15,7 @@ or a nodeSelector.
 |---|---|
 | `clusters/home/` | The Flux entrypoint — controllers, the `GitRepository` source, and the `Kustomization` CRDs that wire cluster to repo paths. |
 | `apps/` | Application workloads. `prod/` is deployed; `base/` and `no-deployment/` are not. |
-| `infrastructure/` | Core services — cert-manager, nginx ingress, letsencrypt, the 1Password operator, the k3s upgrade controller. |
+| `infrastructure/` | Core services — cert-manager, the two Traefik ingress controllers, letsencrypt, the 1Password operator, the k3s upgrade controller. |
 | `infrastructure/base/sources/` | Flux `HelmRepository` CRDs — the chart repos everything else pulls from. |
 
 ## How it deploys
@@ -44,6 +44,30 @@ Everything outside those two roots is inert: `apps/base/`, `apps/no-deployment/`
 `infrastructure/raspberry-pi-cluster/`, and any base component missing from the
 allow-list.
 
+## Ingress
+
+Two self-managed Traefik instances (Flux `HelmRelease`s in `infrastructure/base/`)
+split public from private traffic. Each runs as a single-pod DaemonSet binding
+ports 80/443 as hostPorts on one node, with no Service in front:
+
+| Instance | Node | Reachable from | Serves |
+|---|---|---|---|
+| `traefik-public` | `kube-master` | The internet — the home router forwards 80/443 to this node only. | wedding, Home Assistant |
+| `traefik-private` | `pi-alpha` | The LAN only — nothing is forwarded to this node, and its entrypoints also reject non-RFC1918 clients. | wealthfolio |
+
+Each instance has its own IngressClass, of the same name, and neither is the
+default: an Ingress without `ingressClassName` is served by nothing. Both
+redirect HTTP to HTTPS and apply compression and HSTS to every host.
+
+TLS comes from cert-manager. Public hosts use `letsencrypt-prod` (HTTP-01, solved
+through `traefik-public`). Private hosts are unreachable from Let's Encrypt, so
+they use `letsencrypt-prod-dns01`, which proves ownership with a Cloudflare DNS
+record; its API token comes from 1Password (`cloudflare-api-token` in the
+`cert-manager` namespace).
+
+A private host also needs a LAN DNS entry pointing it at `pi-alpha`. LAN DNS is
+dnsmasq, outside the cluster, and that entry is added **by hand**.
+
 ## Adding an app
 
 Each app directory is one namespace, and mixes three styles as needed: a Helm
@@ -59,8 +83,11 @@ well — otherwise it deploys nothing.
 
 ### Conventions
 
-- Ingress: `kubernetes.io/ingress.class: nginx`, with
-  `cert-manager.io/cluster-issuer: letsencrypt-prod` for TLS.
+- Ingress, public: `spec.ingressClassName: traefik-public`, with
+  `cert-manager.io/cluster-issuer: letsencrypt-prod`.
+- Ingress, private: `spec.ingressClassName: traefik-private`, with
+  `cert-manager.io/cluster-issuer: letsencrypt-prod-dns01`, plus the manual LAN
+  DNS entry described above.
 - Pin Helm chart versions; declare the chart repo in `infrastructure/base/sources/`.
 - Set resource requests and limits, and `revisionHistoryLimit: 2`.
 - Never commit secrets — see below.
