@@ -201,9 +201,9 @@ data:
   SYSTEM_UPGRADE_JOB_BACKOFF_LIMIT: "99"
   SYSTEM_UPGRADE_JOB_IMAGE_PULL_POLICY: Always
   # The drain/cordon job's kubectl. Upstream defaults this to v1.30.3, which is
-  # outside kubectl's supported +/-1 minor skew once the cluster is on 1.35.
+  # outside kubectl's supported +/-1 minor skew on any current cluster.
   # Keep it within one minor of the Plans' `version:` when bumping them.
-  SYSTEM_UPGRADE_JOB_KUBECTL_IMAGE: rancher/kubectl:v1.35.6
+  SYSTEM_UPGRADE_JOB_KUBECTL_IMAGE: rancher/kubectl:v1.36.2
   SYSTEM_UPGRADE_JOB_KUBECTL_IMAGE_WINDOWS: ""
   SYSTEM_UPGRADE_JOB_PRIVILEGED: "true"
   SYSTEM_UPGRADE_JOB_TTL_SECONDS_AFTER_FINISH: "900"
@@ -230,7 +230,7 @@ spec:
         # The controller reads the ConfigMap below (envFrom) only at start, and a
         # ConfigMap change alone does not roll the pod. Change this value in the
         # same commit as any ConfigMap edit so the new settings take effect.
-        homelab/config-revision: "kubectl-v1.35.6"
+        homelab/config-revision: "kubectl-v1.36.2"
       labels:
         app.kubernetes.io/component: controller
         app.kubernetes.io/name: system-upgrade-controller
