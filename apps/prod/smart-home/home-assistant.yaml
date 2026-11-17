@@ -5,17 +5,11 @@ metadata:
 spec:
   type: ExternalName
   externalName: home-assistant.lan
-  # An ExternalName Service has no endpoints, so each controller picks the
-  # upstream port its own way: ingress-nginx dials targetPort (8123) behind
-  # port 80, Traefik dials the Service port itself. Port 8123 therefore has to
-  # exist as a Service port for Traefik. Both stay until the nginx Ingress is
-  # retired, then this collapses to the single 8123 port. Multi-port Services
-  # require every port to be named.
+  # An ExternalName Service has no endpoints, so targetPort is meaningless:
+  # Traefik dials the external host on the Service *port* itself. The port
+  # therefore has to equal Home Assistant's real listener, 8123.
   ports:
     - name: http
-      port: 80
-      targetPort: 8123
-    - name: http-8123
       port: 8123
       targetPort: 8123
 ---
@@ -24,9 +18,13 @@ kind: Ingress
 metadata:
   name: home-assistant-ingress
   annotations:
-    kubernetes.io/ingress.class: 'nginx'
+    # HTTP-01 issuer; its solver Ingress is also served by traefik-public.
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  # traefik-public is not the default IngressClass, so without this the
+  # Ingress is served by nothing. Websockets (/api/websocket) need no
+  # annotation on Traefik; upgrades are proxied by default.
+  ingressClassName: traefik-public
   rules:
     - host: home-assistant.home.gsdev.me
       http:
@@ -36,8 +34,10 @@ spec:
             backend:
               service:
                 name: home-assistant
+                # Must match the Service port above, which Traefik dials
+                # directly on the ExternalName host.
                 port:
-                  number: 80
+                  number: 8123
   tls:
     - hosts:
         - home-assistant.home.gsdev.me
