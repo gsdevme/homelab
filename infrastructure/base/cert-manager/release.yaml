@@ -22,3 +22,10 @@ spec:
     crds:
       enabled: true
       keep: true
+    # DNS-01 self-check: before asking Let's Encrypt to validate, cert-manager
+    # looks up the _acme-challenge TXT record itself. The LAN resolver overrides
+    # private hosts locally, so going through it (or following its answers to
+    # the authoritative servers) can give a split-horizon view and stall the
+    # challenge. Ask public recursive resolvers only.
+    dns01RecursiveNameservers: "1.1.1.1:53,9.9.9.9:53"
+    dns01RecursiveNameserversOnly: true
