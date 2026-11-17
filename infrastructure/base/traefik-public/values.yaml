@@ -1,0 +1,133 @@
+# Values for the traefik-public instance (chart traefik 42.4.0).
+# Only non-default values are set; each says why.
+
+deployment:
+  # One pod on the node the router forwards to, binding hostPorts directly.
+  # k3s servicelb is disabled, so a LoadBalancer Service would stay Pending.
+  kind: DaemonSet
+  revisionHistoryLimit: 2
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    # The chart default (maxSurge 1) deadlocks with hostPort: the surge pod
+    # can never bind the port the old pod still holds. Replace in place.
+    maxUnavailable: 1
+    maxSurge: 0
+
+# kube-master is the node the home router forwards 80/443 to.
+nodeSelector:
+  kubernetes.io/hostname: kube-master
+
+# Traffic arrives on hostPorts; no Service is needed (and a LoadBalancer
+# Service would never get an address with servicelb disabled).
+service:
+  enabled: false
+
+ingressClass:
+  enabled: true
+  # Never default: every Ingress must opt in to public exposure explicitly.
+  isDefaultClass: false
+  name: traefik-public
+
+providers:
+  kubernetesIngress:
+    enabled: true
+    # Only serve Ingresses of this instance's class, so private hosts are
+    # never routed (or their TLS secrets loaded) by the public instance.
+    ingressClass: traefik-public
+    # Home Assistant runs outside the cluster behind an ExternalName Service.
+    allowExternalNameServices: true
+    # No Service to copy status from; publish the node IP instead.
+    publishedService:
+      enabled: false
+    ingressEndpoint:
+      ip: 172.16.16.17
+  kubernetesCRD:
+    enabled: true
+    # Classless IngressRoutes/Middlewares must not go public; only objects
+    # annotated kubernetes.io/ingress.class: traefik-public are loaded.
+    ingressClass: traefik-public
+    # Only this namespace may define the cluster-wide default TLSOption/TLSStore.
+    defaultTLSResourcesNamespace: traefik-public
+    # Keep the classic <namespace>-<name>@kubernetescrd naming that the
+    # entrypoint middleware references below rely on (also silences the
+    # startup warning).
+    safeNaming: false
+  # No Gateway API use; also keeps the chart from rendering Gateway objects.
+  kubernetesGateway:
+    enabled: false
+
+core:
+  # Reject TLS 1.0/1.1 and weak ciphers on the default TLS options.
+  strictTLSOptions: true
+
+# No dashboard: nothing to expose or protect.
+api:
+  dashboard: false
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+ports:
+  web:
+    # Routers without explicit entrypoints attach only to web/websecure,
+    # never to the internal traefik (8080) or metrics (9100) entrypoints.
+    asDefault: true
+    # Test port while ingress-nginx still holds 80; becomes 80 at cut-over.
+    hostPort: 18080
+    http:
+      # Plain HTTP only ever redirects to HTTPS (301, matches nginx).
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    asDefault: true
+    # Test port while ingress-nginx still holds 443; becomes 443 at cut-over.
+    hostPort: 18443
+    http:
+      # Preserve the nginx defaults every host had: compression and HSTS.
+      middlewares:
+        - traefik-public-compress@kubernetescrd
+        - traefik-public-hsts@kubernetescrd
+
+accessLog:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 1000m
+    memory: 128Mi
+
+# Entrypoint middlewares. Each carries the class annotation because the
+# kubernetesCRD provider's ingressClass filter applies to Middlewares too.
+extraObjects:
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: compress
+      namespace: traefik-public
+      annotations:
+        kubernetes.io/ingress.class: traefik-public
+    spec:
+      compress:
+        encodings:
+          - br
+          - gzip
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: hsts
+      namespace: traefik-public
+      annotations:
+        kubernetes.io/ingress.class: traefik-public
+    spec:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true

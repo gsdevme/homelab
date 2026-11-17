@@ -7,4 +7,5 @@ resources:
   - letsencrypt
   - system-upgrade-controller
   - onepassword
+  - traefik-public
   #- longhorn

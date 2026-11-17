@@ -11,3 +11,4 @@ resources:
   - minio.yaml
   - longhorn.yaml
   - onepassword.yaml
+  - traefik.yaml

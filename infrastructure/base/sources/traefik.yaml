@@ -1,0 +1,9 @@
+# Official Traefik Labs chart repository; serves the traefik chart used by
+# the traefik-public and traefik-private instances.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: traefik
+spec:
+  interval: 36h0m0s
+  url: https://traefik.github.io/charts

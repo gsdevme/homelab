@@ -1,0 +1,35 @@
+# Internet-facing Traefik: the home router forwards 80/443 to kube-master,
+# where this instance binds hostPorts. It owns the traefik.io CRDs, so the
+# private instance depends on it.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik-public
+spec:
+  releaseName: traefik-public
+  chart:
+    spec:
+      chart: traefik
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+      version: "42.4.0"
+  interval: 8h0m0s
+  # A hostPort DaemonSet rollout replaces the pod in place (old pod must exit
+  # before the new one can bind the port), so allow more than the 5m default.
+  timeout: 10m0s
+  install:
+    # The chart ships the traefik.io CRDs in its crds/ directory; this
+    # release is their owner.
+    crds: Create
+    remediation:
+      retries: 3
+  upgrade:
+    # Keep the CRDs in step with the chart on every upgrade.
+    crds: CreateReplace
+    # Deliberately no upgrade remediation: an automatic rollback could hand
+    # the public ports back to nothing. Failed upgrades are fixed forward.
+  valuesFrom:
+    - kind: ConfigMap
+      name: traefik-public-values
