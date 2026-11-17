@@ -28,9 +28,10 @@ do
   ssh root@$ip "apt-get install curl vim htop lm-sensors open-iscsi sudo -y"
 done
 
-# Only traefik is disabled — servicelb (Klipper, backs the nginx LoadBalancer)
-# and local-storage (the local-path provisioner backing app PVCs) are kept.
-EXTRA_ARGS="--write-kubeconfig-mode 0664 --disable traefik --tls-san $KUBE_VIP"
+# The bundled traefik and servicelb (Klipper) are disabled: ingress is the
+# Flux-managed Traefik binding hostPorts, so no LoadBalancer controller runs.
+# local-storage (the local-path provisioner backing app PVCs) is kept.
+EXTRA_ARGS="--write-kubeconfig-mode 0664 --disable traefik,servicelb --tls-san $KUBE_VIP"
 
 #k3sup install \
 # --ip $MASTER_ONE \

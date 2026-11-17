@@ -68,6 +68,20 @@ record; its API token comes from 1Password (`cloudflare-api-token` in the
 A private host also needs a LAN DNS entry pointing it at `pi-alpha`. LAN DNS is
 dnsmasq, outside the cluster, and that entry is added **by hand**.
 
+### Why hostPorts: servicelb is disabled
+
+The k3s server runs with `--disable traefik,servicelb`. The Traefik above is the
+Flux-managed release, not k3s's bundled one, and there is no load-balancer
+controller at all, so:
+
+- A `LoadBalancer` Service stays `Pending` forever — hence hostPorts.
+- Nothing clears the `service.kubernetes.io/load-balancer-cleanup` finalizer. Deleting
+  a Service that carries it hangs in `Terminating` until the finalizer is removed by
+  hand.
+
+k3s's local-storage (the default `local-path` StorageClass) is still enabled and
+backs the app PVCs.
+
 ## Adding an app
 
 Each app directory is one namespace, and mixes three styles as needed: a Helm
