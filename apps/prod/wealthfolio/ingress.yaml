@@ -3,20 +3,18 @@ kind: Ingress
 metadata:
   name: wealthfolio-ingress
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    # nginx basic auth sits in front of wealthfolio's own Argon2id login. Two
-    # independent credentials, so scanners and any pre-auth bug in the Axum
-    # server never reach the app. cert-manager's HTTP-01 solver gets its own
-    # Ingress without these annotations, so ACME still validates.
-    nginx.ingress.kubernetes.io/auth-type: basic
-    nginx.ingress.kubernetes.io/auth-secret: wealthfolio-basic-auth
-    nginx.ingress.kubernetes.io/auth-realm: "Wealthfolio"
+    # dns-01 via Cloudflare: this host is only reachable on the LAN through
+    # traefik-private, so an HTTP-01 challenge from Let's Encrypt could never
+    # reach it.
+    cert-manager.io/cluster-issuer: letsencrypt-prod-dns01
+    # Basic auth in front of wealthfolio's own Argon2id login. Format is
+    # <namespace>-<middleware name>@kubernetescrd; see middleware.yaml.
+    traefik.ingress.kubernetes.io/router.middlewares: wealthfolio-basic-auth@kubernetescrd
 spec:
-  # ingressClassName, not the kubernetes.io/ingress.class annotation the older
-  # ingresses here use: that annotation is deprecated in ingress-nginx v1.14, and
-  # because IngressClass nginx is not the default one of the two is mandatory or
-  # this Ingress is silently never served.
-  ingressClassName: nginx
+  # traefik-private is not the default IngressClass, so without this the
+  # Ingress is served by nothing. It also keeps the public instance from ever
+  # routing this host or loading its TLS secret.
+  ingressClassName: traefik-private
   rules:
     - host: wealthfolio.home.gsdev.me
       http:
