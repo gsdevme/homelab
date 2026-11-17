@@ -1,8 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: ingress-nginx
-resources:
-  # Only the namespace is left: the HelmRelease is pruned first so Helm can
-  # uninstall cleanly (its release Secret lives in this namespace; deleting
-  # both together could orphan the failurePolicy: Fail admission webhook).
-  - namespace.yaml
