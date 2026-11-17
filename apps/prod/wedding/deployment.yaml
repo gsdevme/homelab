@@ -91,9 +91,12 @@ metadata:
   namespace: wedding
   name: wedding-ingress
   annotations:
-    kubernetes.io/ingress.class: 'nginx'
+    # HTTP-01 issuer; its solver Ingress is also served by traefik-public.
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
+  # traefik-public is not the default IngressClass, so without this the
+  # Ingress is served by nothing.
+  ingressClassName: traefik-public
   rules:
     - host: ceilidhandgavin.com
       http:
