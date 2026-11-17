@@ -1,0 +1,157 @@
+# Values for the traefik-private instance (chart traefik 42.4.0).
+# Only non-default values are set; each says why. Mirrors traefik-public
+# except where noted.
+
+deployment:
+  # One pod on pi-alpha, binding hostPorts directly. k3s servicelb is
+  # disabled, so a LoadBalancer Service would stay Pending.
+  kind: DaemonSet
+  revisionHistoryLimit: 2
+
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    # The chart default (maxSurge 1) deadlocks with hostPort: the surge pod
+    # can never bind the port the old pod still holds. Replace in place.
+    maxUnavailable: 1
+    maxSurge: 0
+
+# pi-alpha holds wealthfolio's volume, and the router forwards nothing to it.
+nodeSelector:
+  kubernetes.io/hostname: pi-alpha
+
+# Traffic arrives on hostPorts; no Service is needed (and a LoadBalancer
+# Service would never get an address with servicelb disabled).
+service:
+  enabled: false
+
+ingressClass:
+  enabled: true
+  # Never default: every Ingress must opt in to the private instance explicitly.
+  isDefaultClass: false
+  name: traefik-private
+
+providers:
+  kubernetesIngress:
+    enabled: true
+    # Only serve Ingresses of this instance's class, so public hosts are
+    # never answered here and private hosts never on the public instance.
+    ingressClass: traefik-private
+    # Nothing private points outside the cluster; keep the chart default
+    # explicit so it is not copied over from the public values by mistake.
+    allowExternalNameServices: false
+    # No Service to copy status from; publish the node IP instead (the LAN
+    # DNS override for private hosts points here).
+    publishedService:
+      enabled: false
+    ingressEndpoint:
+      ip: 172.16.16.60
+  kubernetesCRD:
+    enabled: true
+    # Only objects annotated kubernetes.io/ingress.class: traefik-private
+    # are loaded; classless IngressRoutes/Middlewares are ignored.
+    ingressClass: traefik-private
+    # Only this namespace may define the cluster-wide default TLSOption/TLSStore.
+    defaultTLSResourcesNamespace: traefik-private
+    # Keep the classic <namespace>-<name>@kubernetescrd naming that the
+    # entrypoint middleware references below rely on (also silences the
+    # startup warning).
+    safeNaming: false
+  # No Gateway API use; also keeps the chart from rendering Gateway objects.
+  kubernetesGateway:
+    enabled: false
+
+core:
+  # Reject TLS 1.0/1.1 and weak ciphers on the default TLS options.
+  strictTLSOptions: true
+
+# No dashboard: nothing to expose or protect.
+api:
+  dashboard: false
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+ports:
+  web:
+    # Routers without explicit entrypoints attach only to web/websecure,
+    # never to the internal traefik (8080) or metrics (9100) entrypoints.
+    asDefault: true
+    # Test port while ingress-nginx still holds 80; becomes 80 at cut-over.
+    hostPort: 18080
+    http:
+      # Defence in depth: refuse non-RFC1918 clients even before the redirect.
+      middlewares:
+        - traefik-private-lan-only@kubernetescrd
+      # Plain HTTP only ever redirects to HTTPS (301, matches nginx).
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+  websecure:
+    asDefault: true
+    # Test port while ingress-nginx still holds 443; becomes 443 at cut-over.
+    hostPort: 18443
+    http:
+      # lan-only first so non-LAN clients are rejected before anything else
+      # runs; then the nginx defaults every host had: compression and HSTS.
+      middlewares:
+        - traefik-private-lan-only@kubernetescrd
+        - traefik-private-compress@kubernetescrd
+        - traefik-private-hsts@kubernetescrd
+
+accessLog:
+  enabled: true
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 1000m
+    memory: 128Mi
+
+# Entrypoint middlewares. Each carries the class annotation because the
+# kubernetesCRD provider's ingressClass filter applies to Middlewares too.
+# The traefik.io CRDs come from the traefik-public release (dependsOn).
+extraObjects:
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: lan-only
+      namespace: traefik-private
+      annotations:
+        kubernetes.io/ingress.class: traefik-private
+    spec:
+      # RFC1918 ranges only. Pods see the real client IP because hostPort
+      # traffic is DNATed straight to the pod, not proxied through kube-proxy.
+      ipAllowList:
+        sourceRange:
+          - 10.0.0.0/8
+          - 172.16.0.0/12
+          - 192.168.0.0/16
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: compress
+      namespace: traefik-private
+      annotations:
+        kubernetes.io/ingress.class: traefik-private
+    spec:
+      compress:
+        encodings:
+          - br
+          - gzip
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: hsts
+      namespace: traefik-private
+      annotations:
+        kubernetes.io/ingress.class: traefik-private
+    spec:
+      headers:
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true

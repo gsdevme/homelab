@@ -1,0 +1,39 @@
+# LAN-only Traefik on pi-alpha (where wealthfolio's volume lives). The
+# router forwards nothing to this node, so hosts served here are never
+# reachable from the internet.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: traefik-private
+spec:
+  releaseName: traefik-private
+  # traefik-public installs the traefik.io CRDs this release's Middlewares
+  # need, so it must be Ready first.
+  dependsOn:
+    - name: traefik-public
+      namespace: traefik-public
+  chart:
+    spec:
+      chart: traefik
+      sourceRef:
+        kind: HelmRepository
+        name: traefik
+        namespace: flux-system
+      version: "42.4.0"
+  interval: 8h0m0s
+  # A hostPort DaemonSet rollout replaces the pod in place (old pod must exit
+  # before the new one can bind the port), so allow more than the 5m default.
+  timeout: 10m0s
+  install:
+    # CRDs are owned by traefik-public; two releases managing the same CRDs
+    # would fight over them.
+    crds: Skip
+    remediation:
+      retries: 3
+  upgrade:
+    crds: Skip
+    # Deliberately no upgrade remediation, matching traefik-public: failed
+    # upgrades are fixed forward rather than rolled back automatically.
+  valuesFrom:
+    - kind: ConfigMap
+      name: traefik-private-values
