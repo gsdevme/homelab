@@ -1,0 +1,14 @@
+# Safe to commit: vault/item *names* only, never values. The 1Password operator
+# writes a Secret named cloudflare-api-token into cert-manager, the namespace
+# ClusterIssuers read their secrets from. The item needs a field labelled
+# `api-token` (the Secret key the issuers reference) holding a Cloudflare token
+# with Zone -> DNS -> Edit and Zone -> Zone -> Read on the one zone.
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: cloudflare-api-token
+  # Set explicitly: this kustomization is otherwise all cluster-scoped objects
+  # and has no `namespace:` of its own.
+  namespace: cert-manager
+spec:
+  itemPath: "vaults/homelab/items/cloudflare-api-token"

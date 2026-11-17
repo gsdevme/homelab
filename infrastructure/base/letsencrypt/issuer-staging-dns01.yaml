@@ -1,0 +1,25 @@
+# DNS-01 issuer for hosts served by traefik-private. Those hosts have no public
+# DNS record and are unreachable from the internet, so HTTP-01 cannot work;
+# cert-manager proves control by writing a TXT record through the Cloudflare API
+# instead. Public hosts keep using the HTTP-01 issuer (letsencrypt-staging).
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging-dns01
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    # No email: it is optional for ACME, and Let's Encrypt no longer sends
+    # expiry mail.
+    # ACME account private key (created by cert-manager on first use).
+    privateKeySecretRef:
+      name: letsencrypt-staging-dns01
+    solvers:
+      # An empty selector matches every domain requested from this issuer.
+      - selector: { }
+        dns01:
+          cloudflare:
+            # Secret written by the OnePasswordItem in cloudflare-api-token.yaml.
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token
