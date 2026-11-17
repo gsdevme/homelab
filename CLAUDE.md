@@ -70,6 +70,15 @@ Two Flux-managed Traefik instances (`infrastructure/base/traefik-{public,private
 - ExternalName backends (only traefik-public allows them, e.g. Home Assistant in `apps/prod/smart-home/`): Traefik dials the Service `port`, not `targetPort`, so `port` must equal the upstream's real port.
 - traefik-public owns the traefik.io CRDs (`crds: Create`/`CreateReplace`); traefik-private `dependsOn` it and skips CRDs.
 
+## Issues and pull requests
+
+Multi-step work is tracked as GitHub issues: an epic with a task list of phase issues under one label; each phase has a "To do" checklist and a "Done when" paragraph. Work on a phase goes through a branch and a pull request, not a direct commit to `master`.
+
+- When a pull request is opened or merged, run the `project-manager` agent (`.claude/agents/project-manager.md`) on it; a `PostToolUse` hook (`.claude/hooks/pull-request-issues.py`) asks for this after `gh pr create` and `gh pr merge`. It links the issues the pull request resolves (`Closes #N`) or moves on (`Part of #N`) in the description, and after a merge ticks what was finished.
+- A merge is not a rollout. After merging, reconcile and verify in the cluster, then run the agent again with what was verified so it can tick the items that needed it.
+- Opening, closing and rewording issues stays with the owner.
+- The hook is stdlib Python; check it with `python3 -m unittest discover tests`.
+
 ## Local checks
 
 There is no repo-wide build/test/lint. Validation happens in-cluster via Flux; use `kustomize build <dir>` locally to sanity-check a Kustomize dir before committing.

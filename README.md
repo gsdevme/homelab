@@ -17,6 +17,8 @@ or a nodeSelector.
 | `apps/` | Application workloads. `prod/` is deployed; `base/` and `no-deployment/` are not. |
 | `infrastructure/` | Core services — cert-manager, the two Traefik ingress controllers, letsencrypt, the 1Password operator, the k3s upgrade controller. |
 | `infrastructure/base/sources/` | Flux `HelmRepository` CRDs — the chart repos everything else pulls from. |
+| `.claude/` | Settings for Claude Code sessions in this repo: the `project-manager` agent in `agents/` and the hook in `hooks/` that asks for it. Nothing here is deployed. |
+| `tests/` | Checks on the hook. |
 
 ## How it deploys
 
@@ -81,6 +83,29 @@ controller at all, so:
 
 k3s's local-storage (the default `local-path` StorageClass) is still enabled and
 backs the app PVCs.
+
+## Issues and pull requests
+
+Larger pieces of work are tracked as GitHub issues: one epic with a task list of
+phase issues under one label, each phase with a "To do" checklist and a "Done when"
+paragraph.
+
+When a pull request is opened or merged with `gh` in a Claude Code session,
+`.claude/hooks/pull-request-issues.py` asks for the `project-manager` agent
+(`.claude/agents/project-manager.md`). On a new pull request the agent works out
+which open issues it resolves or moves on and links them in the description under
+"Issues". After a merge it ticks the "To do" items that were finished, notes the
+pull request on the issue, and reports any issue that can now be closed. It never
+opens, closes or rewords an issue itself.
+
+A merge is not a rollout: Flux still has to apply the change, and some items are
+only finished once checked in the cluster. The agent ticks those only when it is
+given the evidence, so say what was verified when asking it.
+
+The hook only sees pull requests made with `gh` through Claude's shell — a commit
+pushed straight to `master` passes it by. It counts a command that is run, not one
+that is mentioned, and it asks GitHub whether a merge happened before saying so.
+Check it with `python3 -m unittest discover tests`.
 
 ## Adding an app
 
