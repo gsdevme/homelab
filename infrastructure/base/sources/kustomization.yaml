@@ -7,7 +7,6 @@ resources:
   - influxdata.yaml
   - prometheus.yaml
   - bitnami.yaml
-  - minio.yaml
   - longhorn.yaml
   - onepassword.yaml
   - traefik.yaml
