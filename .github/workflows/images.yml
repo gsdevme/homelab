@@ -1,0 +1,242 @@
+# Builds the homelab Proxmox VM images (Debian 13 and Alpine 3.23 with the QEMU
+# guest agent, Podman and the homelab update policy), publishes them as a
+# GitHub Release tagged images-YYYYMMDD, and prunes old image releases.
+#
+# The Proxmox module (proxmox/) downloads its images from these releases by
+# tag; proxmox/variables.tf pins the tag it boots in images_release.
+name: images
+
+on:
+  # Weekly rebuild so fresh VMs start from current packages. Mondays 03:17
+  # UTC: off the top of the hour, when scheduled runs queue the longest.
+  schedule:
+    - cron: "17 3 * * 1"
+  # Manual rebuild from the Actions tab.
+  workflow_dispatch:
+  # Rebuild whenever the image definitions or this workflow change, on any
+  # branch. Off master the result is a pre-release (see the release job).
+  # branches: ["**"] so pushing a git tag (including the images- tags this
+  # workflow creates) never starts a build.
+  push:
+    branches: ["**"]
+    paths:
+      - images/**
+      - .github/workflows/images.yml
+
+# Least privilege: every job reads contents only, and the release job alone
+# is granted write (creating and deleting releases and tags needs it).
+permissions:
+  contents: read
+
+# Runs on the same day publish the same images-YYYYMMDD tag; queue them rather
+# than let two race on one release. Not cancelled, so a run already uploading
+# always finishes.
+concurrency:
+  group: images-release
+  cancel-in-progress: false
+
+jobs:
+  # Computes the release tag once, so both matrix builds and the release agree
+  # even if the run crosses midnight UTC. Two forms:
+  #   master:       images-YYYYMMDD
+  #   other branch: images-YYYYMMDD-<first 7 chars of the commit>
+  # so a branch pre-release never shares (or overwrites) a master release's
+  # tag. proxmox/variables.tf accepts both forms in images_release.
+  tag:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - id: tag
+        run: |
+          tag="images-$(date -u +%Y%m%d)"
+          if [[ "$GITHUB_REF_NAME" != master ]]; then
+            tag="${tag}-${GITHUB_SHA::7}"
+          fi
+          echo "tag=${tag}" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      # One distribution failing should not hide whether the other builds.
+      fail-fast: false
+      matrix:
+        distribution: [debian, alpine]
+    env:
+      TAG: ${{ needs.tag.outputs.tag }}
+    steps:
+      # The build runs under sudo and must never see the token, so the
+      # checkout leaves no credentials in .git/config.
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      # virt-customize, virt-sysprep, virt-sparsify, virt-ls and virt-cat
+      # (libguestfs-tools) plus qemu-img (qemu-utils), used by build.sh and
+      # check.sh.
+      #
+      # passt is removed so the libguestfs appliance falls back to QEMU's
+      # built-in user networking (SLIRP). libguestfs 1.58 uses passt whenever
+      # `passt --help` runs, with no setting to turn that off, and the runner
+      # image has passt preinstalled (a Recommends of podman). On the runner,
+      # passt answers no DHCP from the appliance: dhcpcd falls back to an
+      # IPv4LL address with no nameserver, and the customize scripts cannot
+      # resolve the package mirrors. With SLIRP the appliance gets its lease
+      # and resolves through the runner's 127.0.0.53 stub. Removing passt
+      # leaves podman installed (it only recommends passt), and nothing else
+      # in this job uses it.
+      - name: Install libguestfs
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libguestfs-tools qemu-utils
+          sudo apt-get remove -y passt
+
+      # libguestfs boots a small appliance built from the host kernel, and
+      # Ubuntu ships /boot/vmlinuz-* readable by root only. The build runs under
+      # sudo, which can read it anyway; this is the fix libguestfs documents for
+      # Ubuntu, so any virt-* call made without root still works.
+      - name: Make the host kernel readable for libguestfs
+        run: sudo chmod 0644 /boot/vmlinuz*
+
+      # sudo because libguestfs on the runner needs root (host kernel and
+      # /dev/kvm access) and build.sh chowns copied-in files to root:root.
+      # The runner's shell expands $TAG before sudo runs, so no environment
+      # needs to be kept.
+      - name: Build
+        run: sudo images/build.sh "${{ matrix.distribution }}" "$TAG"
+
+      # Only when the build failed: boots the libguestfs appliance once more
+      # on the upstream image build.sh downloaded and prints how its network
+      # came up (passt or SLIRP, the DHCP client, the lease, the resolver it
+      # hands the guest) and whether the guest can resolve names, through the
+      # appliance resolver and through a public one. The customize scripts
+      # need that network to download packages, and a CI-only failure there
+      # cannot be reproduced anywhere else. Filtered, because the full
+      # libguestfs debug log runs to thousands of lines.
+      - name: Show the appliance network after a failed build
+        if: failure()
+        run: |
+          image="images/build/upstream-${{ matrix.distribution }}.qcow2"
+          [[ -f "$image" ]] || exit 0
+          echo "host resolv.conf:"; cat /etc/resolv.conf
+          echo "passt: $(command -v passt || echo none)"
+          if command -v passt >/dev/null; then passt --version | head -1; fi
+          sudo cp "$image" /tmp/probe.qcow2
+          sudo virt-customize -v -x -a /tmp/probe.qcow2 --run-command \
+            'cat /etc/resolv.conf; ip -4 addr; ip -4 route; getent hosts deb.debian.org || echo resolve_fail; if command -v nslookup >/dev/null; then nslookup deb.debian.org 1.1.1.1 || echo public_resolve_fail; fi' \
+            2>&1 | grep -E 'Linux version|accel|passt|netdev|iface=|dhc|eth0|nameserver|inet |via|renaming|resolve|Address|deb\.debian\.org' || true
+
+      # Read-only content checks against the built image; also needs root for
+      # libguestfs.
+      - name: Check
+        run: |
+          name=$(bash -c 'source images/lib.sh && output_name "$1" "$2"' _ "${{ matrix.distribution }}" "$TAG")
+          sudo images/check.sh "${{ matrix.distribution }}" "images/build/${name}"
+
+      # The built .qcow2 and its .sha256 only: *-homelab-* excludes the
+      # upstream-<distro>.qcow2 downloads build.sh leaves beside them.
+      # qcow2 output is already compressed by
+      # virt-sparsify, so the artifact is stored as is. Kept briefly: the
+      # release is the durable copy.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: image-${{ matrix.distribution }}
+          path: images/build/*-homelab-*.qcow2*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 7
+
+  release:
+    needs: [tag, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ needs.tag.outputs.tag }}
+    steps:
+      # For images/prune-releases.sh and the images_release pin it reads from
+      # proxmox/variables.tf. gh authenticates with GH_TOKEN, so the checkout
+      # keeps no credentials of its own.
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      # Each image is downloaded by name rather than with a pattern. The
+      # artifact listing is eventually consistent: run 45586499711 used
+      # `pattern: image-*`, logged "Found 1 artifact(s)" and fetched only
+      # image-alpine although image-debian existed and its job had finished,
+      # so a release went out with one image. A download by name fails the
+      # step when the artifact is missing instead of silently skipping it.
+      - uses: actions/download-artifact@v4
+        with:
+          name: image-debian
+          path: dist
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: image-alpine
+          path: dist
+
+      # Second line of defence behind the by-name downloads: the release
+      # contract is exactly two images plus SHA256SUMS, so refuse to publish
+      # unless each image and its .sha256 sidecar is present and nothing else
+      # is in dist.
+      - name: Check expected files
+        working-directory: dist
+        run: |
+          expected=(
+            "alpine-3.23-homelab-${TAG}.qcow2"
+            "alpine-3.23-homelab-${TAG}.qcow2.sha256"
+            "debian-13-homelab-${TAG}.qcow2"
+            "debian-13-homelab-${TAG}.qcow2.sha256"
+          )
+          actual=$(printf '%s\n' * | LC_ALL=C sort)
+          wanted=$(printf '%s\n' "${expected[@]}" | LC_ALL=C sort)
+          if [[ "$actual" != "$wanted" ]]; then
+            echo "::error::dist does not hold exactly the expected files"
+            ls -l
+            exit 1
+          fi
+
+      - name: Write SHA256SUMS
+        working-directory: dist
+        run: sha256sum ./*-homelab-*.qcow2 | sed 's| \./| |' > SHA256SUMS
+
+      # Runs off master (feature branches) publish pre-releases, so a branch
+      # can be tested end to end without moving the "latest" release; only
+      # master publishes full releases. The tag is created at the built commit
+      # (--target), not at the default branch head. Because branch tags carry
+      # the commit suffix, the --clobber fallback is only reached by a re-run
+      # of the same branch on the same day (master re-run, or the same commit
+      # rebuilt), which replaces that day's assets instead of failing. Exactly
+      # three assets: the two images and SHA256SUMS.
+      - name: Publish release
+        working-directory: dist
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" ./*-homelab-*.qcow2 SHA256SUMS --clobber
+          else
+            prerelease=()
+            if [[ "$GITHUB_REF_NAME" != master ]]; then
+              prerelease=(--prerelease)
+            fi
+            gh release create "$TAG" ./*-homelab-*.qcow2 SHA256SUMS \
+              --title "$TAG" \
+              --target "$GITHUB_SHA" \
+              --notes "Weekly Proxmox VM images: Debian 13 and Alpine 3.23 with the QEMU guest agent, Podman and the homelab update policy. Built from ${GITHUB_SHA}." \
+              "${prerelease[@]}"
+          fi
+
+      # Keeps the newest 8 releases and 2 pre-releases. The release pinned in
+      # master's proxmox/variables.tf is never pruned, whatever its age: the
+      # Proxmox module downloads its image from it, so deleting it would break
+      # every VM (re)created from the pin. Master only: a branch run reads the
+      # pin from its own checkout, so it must never prune, or it could delete
+      # the image master pins.
+      - name: Prune old releases
+        if: github.ref_name == 'master'
+        run: images/prune-releases.sh 8 2
