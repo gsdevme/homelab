@@ -37,6 +37,29 @@ variable "debian_lxc_template_url" {
   default     = "http://download.proxmox.com/images/system/debian-13-standard_13.6-1_amd64.tar.zst"
 }
 
+variable "images_repository" {
+  description = "GitHub repository whose releases carry the weekly VM images."
+  type        = string
+  default     = "gsdevme/homelab"
+}
+
+variable "images_release" {
+  description = "Image release to download, tagged images-YYYYMMDD for master builds or images-YYYYMMDD-<7-char commit> for branch pre-releases. Move it forward to pick up a newer weekly build; existing VMs keep the image they were created from."
+  type        = string
+  default     = "images-20261125-32849c3"
+
+  validation {
+    condition     = can(regex("^images-[0-9]{8}(-[0-9a-f]{7})?$", var.images_release))
+    error_message = "images_release must look like images-YYYYMMDD or images-YYYYMMDD-<7 hex chars>."
+  }
+}
+
+variable "images_datastore" {
+  description = "Datastore the VM images are downloaded to (needs the 'Import' content type)."
+  type        = string
+  default     = "local"
+}
+
 # Comes from 1Password through .env.op as TF_VAR_ssh_public_key.
 variable "ssh_public_key" {
   description = "SSH public key authorised for root in every guest."
