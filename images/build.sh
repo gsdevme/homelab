@@ -18,7 +18,13 @@
 # after the machine-id operation empties the file) and sparsified
 # with compression into the output image, which is checksummed.
 #
-# The customize script downloads packages, so the libguestfs appliance needs
+# Alpine: downloads the newest 3.23 x86_64 bios-cloudinit image from the
+# releases/cloud index, verifies it against its .sha512 file, copies in the
+# first-boot OpenRC script, the daily upgrade job and the same shared drop-ins
+# (chowned to root), runs alpine/customize.sh inside the guest, and finishes
+# with the same work-copy sysprep, sparsify and checksum steps.
+#
+# The customize scripts download packages, so the libguestfs appliance needs
 # its network: libguestfs brings it up with a DHCP client from the host and,
 # for each --run or --run-command, swaps the appliance's /etc/resolv.conf into
 # the guest and restores the guest's own afterwards.
@@ -55,6 +61,26 @@ build_debian() {
     --run "$here/debian/customize.sh"
 }
 
+build_alpine() {
+  local work=$1 resolved url sum
+  curl -fsSL --retry 3 -o "$build/alpine-listing.html" "$ALPINE_BASE_URL"
+  resolved=$(resolve_alpine "$build/alpine-listing.html")
+  url=$(sed -n 1p <<<"$resolved")
+  sum=$(curl -fsSL --retry 3 "$(sed -n 2p <<<"$resolved")" | awk '{print $1}')
+  fetch_verified "$url" "$sum" "$build/upstream-alpine.qcow2"
+  cp "$build/upstream-alpine.qcow2" "$work"
+
+  virt-customize -a "$work" \
+    --copy-in "$here/alpine/homelab-firstboot:/etc/init.d" \
+    --copy-in "$here/alpine/homelab-upgrade.cron:/tmp" \
+    --run-command 'mv /tmp/homelab-upgrade.cron /etc/periodic/daily/homelab-upgrade' \
+    --mkdir /etc/ssh/sshd_config.d \
+    --copy-in "$here/common/10-homelab-root.conf:/etc/ssh/sshd_config.d" \
+    --copy-in "$here/common/90-homelab.cfg:/etc/cloud/cloud.cfg.d" \
+    --run-command 'chown root:root /etc/init.d/homelab-firstboot /etc/periodic/daily/homelab-upgrade /etc/ssh/sshd_config.d/10-homelab-root.conf /etc/cloud/cloud.cfg.d/90-homelab.cfg' \
+    --run "$here/alpine/customize.sh"
+}
+
 [[ $# -eq 2 ]] || usage
 distribution=$1
 tag=$2
@@ -68,8 +94,9 @@ case "$distribution" in
     build_debian "$work"
     ;;
   alpine)
-    echo "not implemented" >&2
-    exit 2
+    out="$build/$(output_name alpine "$tag")"
+    work="$build/work-alpine.qcow2"
+    build_alpine "$work"
     ;;
   *) usage ;;
 esac
