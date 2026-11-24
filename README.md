@@ -17,7 +17,8 @@ or a nodeSelector.
 | `apps/` | Application workloads. `prod/` is deployed; `base/` and `no-deployment/` are not. |
 | `infrastructure/` | Core services — cert-manager, the two Traefik ingress controllers, letsencrypt, the 1Password operator, the k3s upgrade controller. |
 | `infrastructure/base/sources/` | Flux `HelmRepository` CRDs — the chart repos everything else pulls from. |
-| `proxmox/` | OpenTofu for the Proxmox host — guests outside the cluster, LXC containers for now. Applied by hand from a laptop, never by Flux. See [`proxmox/README.md`](proxmox/README.md). |
+| `proxmox/` | OpenTofu for the Proxmox host — guests outside the cluster, LXC containers and virtual machines. Applied by hand from a laptop, never by Flux. See [`proxmox/README.md`](proxmox/README.md). |
+| `images/`, `.github/workflows/images.yml` | The Debian and Alpine VM images `proxmox/` boots, built weekly by the workflow and published as GitHub Releases of this repo. Nothing here is deployed by Flux. |
 | `.claude/` | Settings for Claude Code sessions in this repo: the `project-manager` agent in `agents/` and the hook in `hooks/` that asks for it. Nothing here is deployed. |
 | `tests/` | Checks on the hook. |
 
