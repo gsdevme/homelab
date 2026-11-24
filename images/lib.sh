@@ -22,6 +22,15 @@
 #
 #   output_name <debian|alpine> <tag>
 #       Prints the file name of the built image for that distribution and tag.
+#
+#   select_prunable <keep_releases> <keep_prereleases> <pinned_tag>
+#       Reads `gh release list --json tagName,isPrerelease,createdAt` JSON on
+#       stdin and prints, one per line in ascending tag order, the images-
+#       release tags to delete: everything but the newest <keep_releases>
+#       releases and the newest <keep_prereleases> pre-releases (newest by
+#       tag string: images-YYYYMMDD, or images-YYYYMMDD-<sha7> for branch
+#       pre-releases, which sorts after its unsuffixed date), and never <pinned_tag>. Tags not
+#       starting with images- are never printed. Needs jq.
 
 DEBIAN_BASE_URL="https://cloud.debian.org/images/cloud/trixie/latest/"
 DEBIAN_IMAGE="debian-13-genericcloud-amd64.qcow2"
@@ -72,4 +81,17 @@ output_name() {
       return 1
       ;;
   esac
+}
+
+select_prunable() {
+  local keep_releases=$1 keep_prereleases=$2 pinned=$3
+  jq -r --argjson keep_rel "$keep_releases" --argjson keep_pre "$keep_prereleases" --arg pinned "$pinned" '
+    def stale(pre; keep):
+      map(select(.isPrerelease == pre)) | sort_by(.tagName) | reverse | .[keep:];
+    map(select(.tagName | startswith("images-")))
+    | (stale(false; $keep_rel) + stale(true; $keep_pre))
+    | map(.tagName | select(. != $pinned))
+    | sort
+    | .[]
+  '
 }

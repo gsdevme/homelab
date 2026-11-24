@@ -1,0 +1,17 @@
+[
+  {"tagName":"images-20260101","isPrerelease":false,"createdAt":"2026-01-01T03:17:00Z"},
+  {"tagName":"images-20260102","isPrerelease":false,"createdAt":"2026-01-02T03:17:00Z"},
+  {"tagName":"images-20260103","isPrerelease":false,"createdAt":"2026-01-03T03:17:00Z"},
+  {"tagName":"images-20260104","isPrerelease":false,"createdAt":"2026-01-04T03:17:00Z"},
+  {"tagName":"images-20260105","isPrerelease":false,"createdAt":"2026-01-05T03:17:00Z"},
+  {"tagName":"images-20260106","isPrerelease":false,"createdAt":"2026-01-06T03:17:00Z"},
+  {"tagName":"images-20260107","isPrerelease":false,"createdAt":"2026-01-07T03:17:00Z"},
+  {"tagName":"images-20260108","isPrerelease":false,"createdAt":"2026-01-08T03:17:00Z"},
+  {"tagName":"images-20260109","isPrerelease":false,"createdAt":"2026-01-09T03:17:00Z"},
+  {"tagName":"images-20260110","isPrerelease":false,"createdAt":"2026-01-10T03:17:00Z"},
+  {"tagName":"images-20260201","isPrerelease":true,"createdAt":"2026-02-01T03:17:00Z"},
+  {"tagName":"images-20260202","isPrerelease":true,"createdAt":"2026-02-02T03:17:00Z"},
+  {"tagName":"images-20260203","isPrerelease":true,"createdAt":"2026-02-03T03:17:00Z"},
+  {"tagName":"images-20260203-abc1234","isPrerelease":true,"createdAt":"2026-02-03T09:00:00Z"},
+  {"tagName":"v1.2.3","isPrerelease":false,"createdAt":"2025-06-01T00:00:00Z"}
+]

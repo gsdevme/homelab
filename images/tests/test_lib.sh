@@ -60,6 +60,31 @@ test_resolve_alpine_fails_without_match() {
   ! resolve_alpine fixtures/empty.html 2>/dev/null || fail "should exit non-zero"
 }
 
+test_select_prunable_keeps_latest_and_pinned() {
+  out=$(select_prunable 8 2 images-20260102 <fixtures/releases.json)
+  [[ "$out" == $'images-20260101\nimages-20260201\nimages-20260202' ]] || fail "expected the oldest release and two oldest pre-releases, got: ${out}"
+}
+
+test_select_prunable_prunes_old_prereleases() {
+  out=$(select_prunable 8 1 images-20260110 <fixtures/releases.json)
+  [[ "$out" == $'images-20260101\nimages-20260102\nimages-20260201\nimages-20260202\nimages-20260203' ]] || fail "expected two releases and three pre-releases, got: ${out}"
+}
+
+test_select_prunable_ignores_foreign_tags() {
+  out=$(select_prunable 0 0 images-20260110 <fixtures/releases.json)
+  ! grep -qx v1.2.3 <<<"$out" || fail "foreign tag v1.2.3 selected"
+  ! grep -qx images-20260110 <<<"$out" || fail "pinned tag selected"
+  [[ "$(wc -l <<<"$out" | tr -d ' ')" == 13 ]] || fail "expected the 13 unpinned images- tags, got: ${out}"
+}
+
+test_select_prunable_treats_suffixed_tag_as_newest_prerelease() {
+  out=$(select_prunable 10 1 images-20260110 <fixtures/releases.json)
+  ! grep -qx images-20260203-abc1234 <<<"$out" || fail "newest pre-release images-20260203-abc1234 selected"
+  grep -qx images-20260203 <<<"$out" || fail "images-20260203 should sort below its suffixed sibling"
+  out=$(select_prunable 0 4 images-20260110 <fixtures/releases.json)
+  ! grep -qx images-20260203-abc1234 <<<"$out" || fail "suffixed tag counted as a release, not a pre-release"
+}
+
 tests=(
   test_resolve_debian_finds_qcow2_and_sum
   test_resolve_debian_fails_without_match
@@ -68,6 +93,10 @@ tests=(
   test_resolve_alpine_picks_newest_bios_cloudinit
   test_resolve_alpine_ignores_uefi_metal_and_other_arch
   test_resolve_alpine_fails_without_match
+  test_select_prunable_keeps_latest_and_pinned
+  test_select_prunable_prunes_old_prereleases
+  test_select_prunable_ignores_foreign_tags
+  test_select_prunable_treats_suffixed_tag_as_newest_prerelease
 )
 
 passed=0

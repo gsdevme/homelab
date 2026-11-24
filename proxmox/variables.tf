@@ -44,13 +44,13 @@ variable "images_repository" {
 }
 
 variable "images_release" {
-  description = "Image release to download, tagged images-YYYYMMDD. Move it forward to pick up a newer weekly build; existing VMs keep the image they were created from."
+  description = "Image release to download, tagged images-YYYYMMDD for master builds or images-YYYYMMDD-<7-char commit> for branch pre-releases. Move it forward to pick up a newer weekly build; existing VMs keep the image they were created from."
   type        = string
   default     = "images-20261125-b0170f0"
 
   validation {
-    condition     = can(regex("^images-[0-9]{8}$", var.images_release))
-    error_message = "images_release must look like images-YYYYMMDD."
+    condition     = can(regex("^images-[0-9]{8}(-[0-9a-f]{7})?$", var.images_release))
+    error_message = "images_release must look like images-YYYYMMDD or images-YYYYMMDD-<7 hex chars>."
   }
 }
 
