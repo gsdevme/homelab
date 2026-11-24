@@ -42,11 +42,32 @@ test_fetch_verified_rejects_bad_sum() {
   ! fetch_verified "file://$PWD/fixtures/debian-SHA512SUMS" deadbeef "$tmp/x" 2>/dev/null || fail "bad sum accepted"
 }
 
+test_resolve_alpine_picks_newest_bios_cloudinit() {
+  out=$(resolve_alpine fixtures/alpine-listing.html)
+  [[ "$(sed -n 1p <<<"$out")" == "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/alpine-3.23.8-x86_64-bios-cloudinit-r0.qcow2" ]] || fail "url"
+  [[ "$(sed -n 2p <<<"$out")" == "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/alpine-3.23.8-x86_64-bios-cloudinit-r0.qcow2.sha512" ]] || fail "sha url"
+}
+
+test_resolve_alpine_ignores_uefi_metal_and_other_arch() {
+  out=$(resolve_alpine fixtures/alpine-listing.html)
+  [[ "$(sed -n 1p <<<"$out")" == "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/cloud/alpine-3.23.8-x86_64-bios-cloudinit-r0.qcow2" ]] || fail "url"
+  [[ "$out" != *uefi* ]] || fail "picked uefi"
+  [[ "$out" != *metal* ]] || fail "picked metal"
+  [[ "$out" != *aarch64* ]] || fail "picked aarch64"
+}
+
+test_resolve_alpine_fails_without_match() {
+  ! resolve_alpine fixtures/empty.html 2>/dev/null || fail "should exit non-zero"
+}
+
 tests=(
   test_resolve_debian_finds_qcow2_and_sum
   test_resolve_debian_fails_without_match
   test_output_name
   test_fetch_verified_rejects_bad_sum
+  test_resolve_alpine_picks_newest_bios_cloudinit
+  test_resolve_alpine_ignores_uefi_metal_and_other_arch
+  test_resolve_alpine_fails_without_match
 )
 
 passed=0
