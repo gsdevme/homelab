@@ -17,6 +17,7 @@ or a nodeSelector.
 | `apps/` | Application workloads. `prod/` is deployed; `base/` and `no-deployment/` are not. |
 | `infrastructure/` | Core services — cert-manager, the two Traefik ingress controllers, letsencrypt, the 1Password operator, the k3s upgrade controller. |
 | `infrastructure/base/sources/` | Flux `HelmRepository` CRDs — the chart repos everything else pulls from. |
+| `proxmox/` | OpenTofu for the Proxmox host — guests outside the cluster, LXC containers for now. Applied by hand from a laptop, never by Flux. See [`proxmox/README.md`](proxmox/README.md). |
 | `.claude/` | Settings for Claude Code sessions in this repo: the `project-manager` agent in `agents/` and the hook in `hooks/` that asks for it. Nothing here is deployed. |
 | `tests/` | Checks on the hook. |
 
@@ -44,7 +45,7 @@ hold up app reconciliation too.
 
 Everything outside those two roots is inert: `apps/base/`, `apps/no-deployment/`,
 `infrastructure/raspberry-pi-cluster/`, and any base component missing from the
-allow-list.
+allow-list. `proxmox/` is not Kubernetes at all — Flux never reads it.
 
 ## Ingress
 

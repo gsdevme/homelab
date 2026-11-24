@@ -11,3 +11,12 @@ apps/*/*/secrets.yaml
 services/*/*env
 
 **/kubeconfig
+
+# OpenTofu (proxmox/): state can hold secrets, tfvars and backend.hcl are per machine
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfplan
+.terraform/
+backend.hcl
+crash.log
