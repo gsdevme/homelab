@@ -60,6 +60,38 @@ test_resolve_alpine_fails_without_match() {
   ! resolve_alpine fixtures/empty.html 2>/dev/null || fail "should exit non-zero"
 }
 
+test_select_prunable_keeps_latest_and_pinned() {
+  out=$(select_prunable 8 2 images-20260102 <fixtures/releases.json)
+  [[ "$out" == $'images-20260101\nimages-20260201\nimages-20260202\nimages-20260203\nimages-20260203-abc1234\nimages-20260204-ccc0000' ]] || fail "expected the oldest release and all but the two newest pre-releases, got: ${out}"
+}
+
+test_select_prunable_prunes_old_prereleases() {
+  out=$(select_prunable 8 1 images-20260110 <fixtures/releases.json)
+  [[ "$out" == $'images-20260101\nimages-20260102\nimages-20260201\nimages-20260202\nimages-20260203\nimages-20260203-abc1234\nimages-20260204-bbb0000\nimages-20260204-ccc0000' ]] || fail "expected two releases and six pre-releases, got: ${out}"
+}
+
+test_select_prunable_ignores_foreign_tags() {
+  out=$(select_prunable 0 0 images-20260110 <fixtures/releases.json)
+  ! grep -qx v1.2.3 <<<"$out" || fail "foreign tag v1.2.3 selected"
+  ! grep -qx images-20260110 <<<"$out" || fail "pinned tag selected"
+  [[ "$(wc -l <<<"$out" | tr -d ' ')" == 16 ]] || fail "expected the 16 unpinned images- tags, got: ${out}"
+}
+
+test_select_prunable_ranks_suffixed_tag_as_prerelease_by_age() {
+  out=$(select_prunable 10 4 images-20260110 <fixtures/releases.json)
+  ! grep -qx images-20260203-abc1234 <<<"$out" || fail "images-20260203-abc1234, created after images-20260203, selected"
+  grep -qx images-20260203 <<<"$out" || fail "images-20260203 should rank below its later suffixed sibling"
+  out=$(select_prunable 0 4 images-20260110 <fixtures/releases.json)
+  ! grep -qx images-20260203-abc1234 <<<"$out" || fail "suffixed tag counted as a release, not a pre-release"
+}
+
+test_select_prunable_ranks_same_day_prereleases_by_created_at() {
+  out=$(select_prunable 10 2 images-20260110 <fixtures/releases.json)
+  ! grep -qx images-20260204-aaa0000 <<<"$out" || fail "newest by createdAt (lowest hash) selected"
+  ! grep -qx images-20260204-bbb0000 <<<"$out" || fail "second newest by createdAt selected"
+  grep -qx images-20260204-ccc0000 <<<"$out" || fail "oldest by createdAt (highest hash) kept"
+}
+
 tests=(
   test_resolve_debian_finds_qcow2_and_sum
   test_resolve_debian_fails_without_match
@@ -68,6 +100,11 @@ tests=(
   test_resolve_alpine_picks_newest_bios_cloudinit
   test_resolve_alpine_ignores_uefi_metal_and_other_arch
   test_resolve_alpine_fails_without_match
+  test_select_prunable_keeps_latest_and_pinned
+  test_select_prunable_prunes_old_prereleases
+  test_select_prunable_ignores_foreign_tags
+  test_select_prunable_ranks_suffixed_tag_as_prerelease_by_age
+  test_select_prunable_ranks_same_day_prereleases_by_created_at
 )
 
 passed=0
