@@ -1,0 +1,29 @@
+#!/sbin/openrc-run
+# shellcheck shell=sh disable=SC2034
+#
+# Installed as /etc/init.d/homelab-firstboot in the default runlevel: on the
+# first boot of a freshly cloned VM, once the network is up and cloud-init has
+# finished, brings it fully up to date and writes a marker. Idempotent: with
+# the marker present it does no upgrade. After a successful run it removes
+# itself from the default runlevel so later boots skip it entirely. OpenRC
+# reads the description variable, hence the SC2034 exemption.
+
+description="Full upgrade on first boot"
+marker=/var/lib/homelab/firstboot-done
+
+depend() {
+  need net
+  after cloud-final
+}
+
+start() {
+  ebegin "Running homelab first-boot upgrade"
+  if [ ! -e "$marker" ]; then
+    if ! { apk update && apk upgrade --available && touch "$marker"; }; then
+      eend 1 "first-boot upgrade failed"
+      return 1
+    fi
+  fi
+  rc-update del homelab-firstboot default
+  eend 0
+}

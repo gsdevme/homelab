@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Installed as /etc/periodic/daily/homelab-upgrade and run daily by crond:
+# refreshes the package index and upgrades every installed package, logging
+# the upgrade output to syslog under the homelab-upgrade tag.
+apk update >/dev/null && apk upgrade --available 2>&1 | logger -t homelab-upgrade
