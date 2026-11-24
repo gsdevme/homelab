@@ -20,3 +20,4 @@ services/*/*env
 .terraform/
 backend.hcl
 crash.log
+images/build/
