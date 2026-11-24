@@ -14,6 +14,7 @@ A Flux v2 GitOps monorepo for a personal Kubernetes homelab. Cluster state is de
 - `apps/` — application workloads. `base/` shared bases, `prod/` deployed apps, `no-deployment/` defined-but-inactive.
 - `infrastructure/` — core services (cert-manager, letsencrypt issuers, `traefik-public`/`traefik-private` ingress, 1Password operator, etc.). `base/` + per-cluster overlays. `infrastructure/base/sources/` defines Flux `HelmRepository` CRDs (the chart repos everything pulls from).
 - `k3sup/home-cluster/install.sh` — one-off cluster bootstrap (k3s via k3sup). The actual `k3sup install`/`join` commands are **commented out**, so it's a historical record, not run on deploys. The server runs with `--disable traefik,servicelb`: k3s's bundled Traefik is off (the Traefik here is the Flux HelmRelease), and so is **servicelb** (Klipper) — there is no load-balancer controller, so a `LoadBalancer` Service stays Pending forever (ingress uses hostPorts instead) and nothing clears the `service.kubernetes.io/load-balancer-cleanup` finalizer (deleting a Service carrying it hangs in Terminating until the finalizer is removed by hand). **local-storage** (the default `local-path` StorageClass / `rancher.io/local-path` provisioner, which backs the app PVCs — e.g. tesla's) is **kept**. longhorn is defined but commented out of the infra allow-list, so it is not running.
+- `proxmox/` — OpenTofu (`bpg/proxmox` provider, version pinned) for the Proxmox host: guests that live **outside** the cluster, LXC containers for now via `modules/lxc`. Flux never reads it; it is applied by hand from a laptop with `op run --env-file=.env.op -- tofu apply`. Secrets reach it only as environment variables from the 1Password references in `.env.op`; state is a local file whose path is set in the gitignored `backend.hcl`. `proxmox/README.md` has the setup.
 
 > `README.md` is the human-facing overview of the same ground this file covers, plus the 1Password secrets workflow. It was rewritten in `524d29f`; the stale directory tree it used to carry is gone. Still trust the actual tree over any prose if they disagree.
 
@@ -32,7 +33,7 @@ The `home` cluster reconciles **exactly** `./apps/prod` and `./infrastructure/pr
 - `apps/prod/` has **no** root `kustomization.yaml` — Flux recurses every subdir, so dropping a new app dir under `apps/prod/` makes it live automatically.
 - `infrastructure/prod/kustomization.yaml` composes `../base`, and `infrastructure/base/kustomization.yaml` is an **explicit allow-list** of components. A component only deploys if listed there (e.g. `longhorn` is currently commented out, so it is *not* running despite existing in the tree).
 
-Everything outside those two roots is inert: `apps/base/`, `apps/no-deployment/`, `infrastructure/raspberry-pi-cluster/`, and any base component not listed in `infrastructure/base/kustomization.yaml` deploy nothing.
+Everything outside those two roots is inert: `apps/base/`, `apps/no-deployment/`, `infrastructure/raspberry-pi-cluster/`, and any base component not listed in `infrastructure/base/kustomization.yaml` deploy nothing. `proxmox/` is not Kubernetes and is never reconciled.
 
 ## App structure
 
@@ -81,7 +82,7 @@ Multi-step work is tracked as GitHub issues: an epic with a task list of phase i
 
 ## Local checks
 
-There is no repo-wide build/test/lint. Validation happens in-cluster via Flux; use `kustomize build <dir>` locally to sanity-check a Kustomize dir before committing.
+There is no repo-wide build/test/lint. Validation happens in-cluster via Flux; use `kustomize build <dir>` locally to sanity-check a Kustomize dir before committing. For `proxmox/`, run `tofu fmt -check -recursive` and `tofu validate`; a merge there changes nothing until someone runs `tofu apply`.
 
 ## Commits
 
