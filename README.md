@@ -72,6 +72,17 @@ record; its API token comes from 1Password (`cloudflare-api-token` in the
 A private host also needs a LAN DNS entry pointing it at `pi-alpha`. LAN DNS is
 dnsmasq, outside the cluster, and that entry is added **by hand**.
 
+`traefik-public` also refuses IPs that [CrowdSec](infrastructure/base/crowdsec/)
+has banned. CrowdSec detects scanners from `traefik-public`'s access log, and a
+bouncer plugin inside Traefik answers banned IPs with 403 on every request,
+before the HTTP→HTTPS redirect and for unknown hosts too: a lowest-priority
+catch-all route makes every HTTPS request reach the bouncer, then answers
+everyone else 404 as before (CrowdSec counts those 404s). It fails open: if the
+CrowdSec API is down, traffic flows. List or lift bans with
+`kubectl -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions list` and
+`... cscli decisions delete --ip <ip>`. Keep the access-log format and the
+`traefik-public` release name as they are; detection depends on both.
+
 ### Why hostPorts: servicelb is disabled
 
 The k3s server runs with `--disable traefik,servicelb`. The Traefik above is the

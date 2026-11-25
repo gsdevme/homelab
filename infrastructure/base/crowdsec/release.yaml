@@ -1,7 +1,6 @@
-# CrowdSec in detect-only mode: an agent reads traefik-public's access logs
-# and the local API (LAPI) turns what it sees into alerts and decisions.
-# Nothing acts on those decisions yet - enforcement is a bouncer inside
-# traefik-public, added in a separate change.
+# CrowdSec: an agent reads traefik-public's access logs and the local API
+# (LAPI) turns what it sees into alerts and decisions. The bouncer plugin
+# inside traefik-public enforces them (infrastructure/base/traefik-public).
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
