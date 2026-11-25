@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: traefik-public
 resources:
   - namespace.yaml
+  - crowdsec-bouncer-key.yaml
   - release.yaml
 configMapGenerator:
   - name: traefik-public-values
