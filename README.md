@@ -5,9 +5,19 @@ Cluster state is declared here and reconciled automatically — there is no manu
 `kubectl apply` in the normal workflow. **Editing manifests and committing to
 `master` is the deploy mechanism**; Flux syncs roughly every 10 minutes.
 
-One live cluster, `home`: a k3s cluster of four nodes — an amd64 control-plane and
-three arm64 Raspberry Pis. Workloads that must land on a Pi use `arm64` node affinity
-or a nodeSelector.
+One live cluster, `home`: a k3s cluster of four nodes — an amd64 control-plane (a VM
+on the Proxmox host) and three arm64 Raspberry Pis. Workloads that must land on a Pi
+use `arm64` node affinity or a nodeSelector.
+
+## Architecture
+
+![Physical layout: the home router connects over the LAN to a Synology NAS, a Proxmox VE host and three Raspberry Pis; the k3s cluster is the kube-master VM plus the three Pis](docs/images/physical-layout.svg)
+
+One Proxmox host and three Raspberry Pis hang off the home LAN. The k3s cluster is
+the `kube-master` VM plus the three Pis. The router forwards ports 80 and 443 to
+`kube-master` only, so that is the single way in from the internet; `pi-alpha` serves
+the LAN-only ingress. The Proxmox host also runs the guests that live outside the
+cluster and backs up to a Synology NAS.
 
 ## Layout
 

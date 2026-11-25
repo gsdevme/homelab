@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 590" role="img" aria-labelledby="pl-title pl-desc">
+  <title id="pl-title">Homelab physical layout</title>
+  <desc id="pl-desc">The home router connects over the LAN to a Synology NAS, one Proxmox VE host and three Raspberry Pis. The Proxmox host runs dnsmasq, Pi-hole and an MQTT broker as LXC containers, Home Assistant and kube-master as QEMU VMs, and backs up to the NAS. The k3s cluster is kube-master plus the three Pis. Ports 80 and 443 are forwarded from the router to kube-master only.</desc>
+  <style>
+    svg {
+      --bg: #f6f7f9; --surface: #ffffff; --fg: #1b2330; --muted: #5a6677; --line: #c3cad4;
+      --accent: #1f6f8b; --accent-wash: rgba(31, 111, 139, 0.07);
+      --pcb: #2f8f5b; --pcb-edge: #1f6b42; --metal: #c2c8d0; --metal-edge: #7d8794;
+      --chip: #22272e; --gold: #e0b84c;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --bg: #12161c; --surface: #1a2029; --fg: #e4e8ee; --muted: #9aa5b4; --line: #3a4554;
+        --accent: #6cc0dc; --accent-wash: rgba(108, 192, 220, 0.08);
+        --pcb: #2c8a57; --pcb-edge: #6fcf9a; --metal: #aab2bd; --metal-edge: #e1e6ec;
+        --chip: #10141a; --gold: #e6c05a;
+      }
+    }
+    .canvas { fill: var(--surface); }
+    .wire { stroke: var(--fg); stroke-width: 1.6; fill: none; }
+    .backup { stroke: var(--fg); stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; }
+    .box { fill: var(--surface); stroke: var(--fg); stroke-width: 1.5; }
+    .host { fill: var(--bg); stroke: var(--fg); stroke-width: 2; }
+    .guest { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+    .bay { fill: var(--bg); stroke: var(--line); stroke-width: 1.2; }
+    .led { fill: var(--pcb); }
+    .cluster { fill: var(--accent-wash); stroke: var(--accent); stroke-width: 1.8; stroke-dasharray: 7 5; }
+    .path-in { stroke: var(--accent); stroke-width: 2.6; fill: none; }
+    .arrowhead { fill: var(--accent); }
+    .arrowhead-fg { fill: var(--fg); }
+    .t { fill: var(--fg); font-size: 13px; }
+    .t-strong { fill: var(--fg); font-size: 14px; font-weight: 600; }
+    .t-muted { fill: var(--muted); font-size: 12px; }
+    .t-accent { fill: var(--accent); font-size: 13px; font-weight: 600; }
+    .pcb { fill: var(--pcb); stroke: var(--pcb-edge); stroke-width: 1.5; }
+    .port { fill: var(--metal); stroke: var(--metal-edge); stroke-width: 1.2; }
+    .chip { fill: var(--chip); }
+    .pins { stroke: var(--gold); stroke-width: 2; stroke-dasharray: 2 3; fill: none; }
+    .hole { fill: var(--surface); stroke: var(--gold); stroke-width: 1.6; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <polygon class="arrowhead" points="0,0 10,5 0,10" />
+    </marker>
+    <marker id="arrow-fg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <polygon class="arrowhead-fg" points="0,0 10,5 0,10" />
+    </marker>
+    <g id="pi">
+      <rect class="port" x="12" y="-16" width="34" height="28" rx="2" />
+      <rect class="port" x="54" y="-12" width="22" height="24" rx="2" />
+      <rect class="port" x="82" y="-12" width="22" height="24" rx="2" />
+      <rect class="pcb" x="0" y="0" width="110" height="140" rx="8" />
+      <rect class="chip" x="89" y="24" width="13" height="100" rx="2" />
+      <line class="pins" x1="93" y1="28" x2="93" y2="121" />
+      <line class="pins" x1="98" y1="28" x2="98" y2="121" />
+      <rect class="chip" x="28" y="52" width="36" height="36" rx="3" />
+      <rect class="chip" x="34" y="100" width="24" height="14" rx="2" />
+      <circle class="hole" cx="10" cy="30" r="3.5" />
+      <circle class="hole" cx="76" cy="30" r="3.5" />
+      <circle class="hole" cx="10" cy="130" r="3.5" />
+      <circle class="hole" cx="76" cy="130" r="3.5" />
+    </g>
+  </defs>
+
+  <rect class="canvas" x="0" y="0" width="1120" height="590" />
+
+  <!-- Internet and router -->
+  <rect class="box" x="490" y="18" width="140" height="38" rx="19" />
+  <text class="t-strong" x="560" y="42" text-anchor="middle">Internet</text>
+  <line class="wire" x1="560" y1="56" x2="560" y2="90" />
+  <rect class="box" x="470" y="90" width="180" height="50" rx="6" />
+  <text class="t-strong" x="560" y="120" text-anchor="middle">Home router</text>
+  <line class="wire" x1="560" y1="140" x2="560" y2="190" />
+
+  <!-- LAN -->
+  <line class="wire" x1="90" y1="190" x2="1040" y2="190" />
+  <text class="t-muted" x="1040" y="180" text-anchor="end">Home LAN</text>
+  <line class="wire" x1="90" y1="150" x2="90" y2="190" />
+  <line class="wire" x1="150" y1="190" x2="150" y2="240" />
+  <line class="wire" x1="594" y1="190" x2="594" y2="316" />
+  <line class="wire" x1="784" y1="190" x2="784" y2="316" />
+  <line class="wire" x1="974" y1="190" x2="974" y2="316" />
+
+  <!-- Synology NAS: backup target for the Proxmox host -->
+  <rect class="box" x="40" y="80" width="220" height="70" rx="6" />
+  <rect class="bay" x="52" y="92" width="12" height="46" rx="2" />
+  <rect class="bay" x="68" y="92" width="12" height="46" rx="2" />
+  <text class="t-strong" x="168" y="111" text-anchor="middle">Synology NAS</text>
+  <text class="t-muted" x="168" y="130" text-anchor="middle">Proxmox backups</text>
+  <line class="backup" x1="220" y1="240" x2="220" y2="155" marker-end="url(#arrow-fg)" />
+  <text class="t-muted" x="230" y="222">backups</text>
+
+  <!-- Proxmox host -->
+  <rect class="host" x="40" y="240" width="440" height="328" rx="8" />
+  <text class="t-strong" x="60" y="268">Proxmox VE host</text>
+  <circle class="led" cx="440" cy="262" r="3.5" />
+  <circle class="led" cx="452" cy="262" r="3.5" />
+  <circle class="led" cx="464" cy="262" r="3.5" />
+
+  <rect class="guest" x="64" y="296" width="180" height="50" rx="5" />
+  <text class="t" x="154" y="318" text-anchor="middle">dnsmasq</text>
+  <text class="t-muted" x="154" y="335" text-anchor="middle">LXC · LAN DNS</text>
+  <rect class="guest" x="64" y="358" width="180" height="50" rx="5" />
+  <text class="t" x="154" y="380" text-anchor="middle">Pi-hole</text>
+  <text class="t-muted" x="154" y="397" text-anchor="middle">LXC · DNS for one subnet</text>
+  <rect class="guest" x="64" y="420" width="180" height="50" rx="5" />
+  <text class="t" x="154" y="442" text-anchor="middle">MQTT broker</text>
+  <text class="t-muted" x="154" y="459" text-anchor="middle">LXC</text>
+  <rect class="guest" x="64" y="482" width="180" height="50" rx="5" />
+  <text class="t" x="154" y="504" text-anchor="middle">Home Assistant</text>
+  <text class="t-muted" x="154" y="521" text-anchor="middle">QEMU VM</text>
+
+  <!-- k3s cluster outline: spans the VM and the Pis -->
+  <rect class="cluster" x="292" y="284" width="784" height="264" rx="14" />
+  <text class="t-accent" x="684" y="538" text-anchor="middle">k3s cluster · 1 control plane + 3 workers</text>
+
+  <rect class="box" x="310" y="332" width="140" height="140" rx="6" />
+  <text class="t-strong" x="380" y="392" text-anchor="middle">kube-master</text>
+  <text class="t-muted" x="380" y="411" text-anchor="middle">QEMU VM · amd64</text>
+  <text class="t-muted" x="380" y="428" text-anchor="middle">control plane</text>
+
+  <!-- Raspberry Pis -->
+  <use href="#pi" x="565" y="332" />
+  <text class="t-strong" x="620" y="492" text-anchor="middle">pi-alpha</text>
+  <text class="t-muted" x="620" y="509" text-anchor="middle">worker · LAN-only ingress</text>
+
+  <use href="#pi" x="755" y="332" />
+  <text class="t-strong" x="810" y="492" text-anchor="middle">pi-beta</text>
+  <text class="t-muted" x="810" y="509" text-anchor="middle">worker</text>
+
+  <use href="#pi" x="945" y="332" />
+  <text class="t-strong" x="1000" y="492" text-anchor="middle">pi-gamma</text>
+  <text class="t-muted" x="1000" y="509" text-anchor="middle">worker</text>
+
+  <!-- The one way in from the internet -->
+  <path class="path-in" d="M 520 140 L 520 164 L 380 164 L 380 328" marker-end="url(#arrow)" />
+  <text class="t-accent" x="390" y="222">80/443 forwarded</text>
+</svg>
