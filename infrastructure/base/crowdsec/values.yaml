@@ -23,6 +23,11 @@ agent:
     - namespace: traefik-public
       podName: traefik-public-*
       program: traefik
+      # /var/log/containers holds symlinks into /var/log/pods, and inotify on
+      # a symlink does not see the kubelet rotating the file behind it: the
+      # agent would keep its handle on the rotated file and silently stop
+      # reading new lines. Polling follows the path instead.
+      poll_without_inotify: true
   env:
     # Parsers and scenarios for Traefik access logs (HTTP probing, crawlers,
     # known CVE paths, ...). Installed from the hub on every start.
