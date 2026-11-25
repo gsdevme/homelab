@@ -1,0 +1,14 @@
+# Safe to commit: vault/item *names* only, never values. The 1Password
+# operator writes a Secret named crowdsec-bouncer-traefik into this
+# namespace; its `key` field is mounted into the Traefik pod as
+# /etc/traefik/crowdsec/key, which the bouncer plugin reads (values.yaml).
+#
+# Same item as infrastructure/base/crowdsec/bouncer-key.yaml, where the
+# CrowdSec local API registers the `traefik` bouncer with it, so both ends
+# always hold the same key.
+apiVersion: onepassword.com/v1
+kind: OnePasswordItem
+metadata:
+  name: crowdsec-bouncer-traefik
+spec:
+  itemPath: "vaults/homelab/items/crowdsec-bouncer-traefik"

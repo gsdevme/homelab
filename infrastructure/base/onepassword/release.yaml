@@ -61,6 +61,12 @@ spec:
         # bouncer with. Same trade-off: the operator can also touch the
         # chart's own Secrets there (LAPI shared secret, registration token).
         - crowdsec
+        # Holds the same bouncer key, which the internet-facing Traefik
+        # mounts. Wider trade-off than the others: the role also covers
+        # pods, configmaps and daemonsets, so the operator could rewrite the
+        # public ingress itself (its other Secrets are only Helm release
+        # records; the TLS certificates live in the app namespaces).
+        - traefik-public
       # Global true means editing any item in the vault can restart unrelated
       # workloads. Opt in per workload with the annotation
       # operator.1password.io/auto-restart: "true".
