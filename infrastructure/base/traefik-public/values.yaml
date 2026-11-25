@@ -79,6 +79,12 @@ ports:
     # unprivileged container needs no NET_BIND_SERVICE.
     hostPort: 80
     http:
+      # The bouncer runs before the redirect: Traefik implements the redirect
+      # as an internal router on this entrypoint and prepends these
+      # middlewares to it like to any other router, so a banned IP gets 403
+      # here instead of a 301.
+      middlewares:
+        - traefik-public-crowdsec@kubernetescrd
       # Plain HTTP only ever redirects to HTTPS, permanently (301), so clients
       # and search engines remember the HTTPS URL.
       redirections:
@@ -91,32 +97,175 @@ ports:
     # Bound on the node itself (CNI portmap DNAT to the pod's 8443).
     hostPort: 443
     http:
-      # Applied to every host: br/gzip compression to cut transfer size, and
-      # HSTS so browsers refuse to downgrade to plain HTTP.
+      # Prepended to every router on this entrypoint, in this order. The
+      # bouncer goes first so a banned IP is refused before anything else
+      # runs. Then, for every host, br/gzip compression to cut transfer size
+      # and HSTS so browsers refuse to downgrade to plain HTTP.
+      # Entrypoint middlewares only run for requests that match a router;
+      # the catch-all IngressRoute below makes every request match one.
       middlewares:
+        - traefik-public-crowdsec@kubernetescrd
         - traefik-public-compress@kubernetescrd
         - traefik-public-hsts@kubernetescrd
 
 # CrowdSec reads this log to detect scanners: its agent tails this pod's
 # container log and parses the default (CLF) access-log lines, including the
-# 404s for requests that match no router. Turning the log off, filtering
-# status codes out of it, or changing its format or fields stops detection
-# without any error. So does renaming the release, since the agent finds the
-# log by the traefik-public-* pod name (infrastructure/base/crowdsec/values.yaml).
+# 404s for unknown hosts and paths (logged under the catch-all router's name
+# since that router exists; the parser accepts any router name). Turning the
+# log off, filtering status codes out of it, or changing its format or fields
+# stops detection without any error. So does renaming the release, since the
+# agent finds the log by the traefik-public-* pod name
+# (infrastructure/base/crowdsec/values.yaml).
 accessLog:
   enabled: true
 
+# CrowdSec bouncer: refuses IPs the CrowdSec local API (infrastructure/base/
+# crowdsec) has banned, with 403, on both entrypoints. Stream mode: the
+# plugin pulls the decision list every 60s and answers from memory, so no
+# request waits on CrowdSec.
+#
+# Traefik downloads the plugin over the internet (its plugin catalog, which
+# fetches it from GitHub) every time the pod starts. If that download fails,
+# Traefik still starts but with plugins disabled: every router that carries
+# the crowdsec middleware - all of them, through the entrypoint lists above -
+# fails to build, so every request gets 404, the HTTP->HTTPS redirect
+# included, until the pod is restarted with internet access.
+#
+# Unban: kubectl -n crowdsec exec deploy/crowdsec-lapi -- cscli decisions delete --ip <ip>
+# (list with `cscli decisions list`; the plugin drops it on its next pull).
+experimental:
+  plugins:
+    bouncer:
+      moduleName: github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      version: v1.8.2
+
+# The bouncer's LAPI key, as the file /etc/traefik/crowdsec/key (read-only;
+# the chart names the volume after the Secret). The Secret is written by the
+# 1Password operator from crowdsec-bouncer-key.yaml. Deliberately not
+# optional: the plugin refuses to start without the file, which would drop
+# every router until the next restart, whereas a missing Secret on a
+# required volume only holds the pod in ContainerCreating until the Secret
+# appears. The plugin reads the key once at startup, so after rotating it
+# restart this pod.
+volumes:
+  - name: crowdsec-bouncer-traefik
+    mountPath: /etc/traefik/crowdsec
+    type: secret
+
+# Memory is 256Mi (not the 128Mi of traefik-private) because the bouncer
+# plugin runs inside Traefik's process and keeps the ban list in memory.
 resources:
   requests:
     cpu: 50m
-    memory: 128Mi
+    memory: 256Mi
   limits:
     cpu: 1000m
-    memory: 128Mi
+    memory: 256Mi
 
-# Entrypoint middlewares. Each carries the class annotation because the
-# kubernetesCRD provider's ingressClass filter applies to Middlewares too.
+# Middlewares and the catch-all route. Each carries the class annotation
+# because the kubernetesCRD provider's ingressClass filter applies to these
+# objects too.
 extraObjects:
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: crowdsec
+      namespace: traefik-public
+      annotations:
+        kubernetes.io/ingress.class: traefik-public
+    spec:
+      plugin:
+        bouncer:
+          enabled: true
+          crowdsecMode: stream
+          crowdsecLapiScheme: http
+          crowdsecLapiHost: crowdsec-service.crowdsec.svc.cluster.local:8080
+          crowdsecLapiKeyFile: /etc/traefik/crowdsec/key
+          # No WAF: only IP decisions are enforced (the chart's AppSec
+          # component is off in infrastructure/base/crowdsec).
+          crowdsecAppsecEnabled: false
+          # Fail open. -1 means a failed pull never switches the plugin to
+          # blocking everyone (the default, 0, does so on the first failure).
+          # At startup it still waits for one pull (streamStartupBlock, up to
+          # the 10s HTTP timeout) so known bans apply from the first request;
+          # if that pull fails, traffic flows with an empty list and the next
+          # pull 60s later retries. Bans already pulled keep being enforced
+          # while the LAPI is down, until they expire.
+          updateMaxFailure: -1
+          streamStartupBlock: true
+          # Nothing sits in front of this Traefik: the hostPort traffic is
+          # DNATed straight to the pod, so the connection's peer address is
+          # the client. Left empty, this list makes the plugin take the
+          # client from X-Forwarded-For on every request, relying on the
+          # entrypoint stripping a forged one. Listing only loopback (which
+          # no client connects from) makes it always use the peer address, so
+          # a client cannot dodge a ban, or get someone else banned, with a
+          # forged header.
+          forwardedHeadersTrustedIPs:
+            - 127.0.0.1/32
+  # The catch-all route and its 404. Entrypoint middlewares only run for
+  # requests that match a router, so without a catch-all a banned IP asking
+  # for an unknown host would still get Traefik's 404 instead of 403. This
+  # route matches every HTTPS request that no real router does (priority 1;
+  # other routers default to the length of their rule, so any real Host rule
+  # outranks it), so the bouncer runs first; everyone it lets through then
+  # gets 404 from not-found, as before.
+  # CrowdSec's probing scenarios count those 404s, so they must stay 404.
+  - apiVersion: traefik.io/v1alpha1
+    kind: Middleware
+    metadata:
+      name: not-found
+      namespace: traefik-public
+      annotations:
+        kubernetes.io/ingress.class: traefik-public
+    spec:
+      # Built-in Traefik has no "always answer 404" middleware, so this is an
+      # allow-list nothing on the internet can pass (loopback only, matched
+      # against the connection's peer address) that answers 404 when it
+      # refuses.
+      ipAllowList:
+        sourceRange:
+          - 127.0.0.1/32
+        rejectStatusCode: 404
+  # Backend placeholder for the catch-all route: no selector, so it never has
+  # endpoints (the provider's allowEmptyServices, a chart default, lets the
+  # router build anyway; it would answer 503 if anything ever reached it).
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: catch-all-unreachable
+      namespace: traefik-public
+    spec:
+      ports:
+        - port: 80
+  - apiVersion: traefik.io/v1alpha1
+    kind: IngressRoute
+    metadata:
+      name: catch-all
+      namespace: traefik-public
+      annotations:
+        kubernetes.io/ingress.class: traefik-public
+    spec:
+      # HTTPS only: on web the redirect router already matches every
+      # request that has a Host header.
+      entryPoints:
+        - websecure
+      routes:
+        - kind: Rule
+          match: PathPrefix(`/`)
+          priority: 1
+          middlewares:
+            - name: not-found
+          # Never reached (not-found refuses every client). It must still be
+          # an ordinary Service and not Traefik's built-in noop@internal:
+          # Traefik leaves routers whose service ends in @internal out of
+          # the access log (unless accessLog.addInternals is set), and
+          # CrowdSec needs these 404s logged.
+          services:
+            - name: catch-all-unreachable
+              port: 80
+      # Traefik's default certificate, as unknown hosts got before.
+      tls: {}
   - apiVersion: traefik.io/v1alpha1
     kind: Middleware
     metadata:

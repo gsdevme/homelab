@@ -1,10 +1,10 @@
 # Values for the crowdsec release (chart crowdsec 0.24.3, CrowdSec v1.8.2).
 # Only non-default values are set; each says why.
 #
-# Detect only: the agent parses traefik-public's access logs and the LAPI
-# records alerts and decisions (`cscli alerts list`, `cscli decisions list`
-# in the lapi pod). Nothing enforces them until the bouncer plugin is added
-# to traefik-public, which is a separate change.
+# The agent parses traefik-public's access logs and the LAPI records alerts
+# and decisions (`cscli alerts list`, `cscli decisions list` in the lapi
+# pod). The bouncer plugin in traefik-public pulls the decisions and refuses
+# banned IPs.
 
 # k3s runs containerd, whose CRI log lines differ from Docker's json-file
 # format; this sets the acquisition label so the right log parser is used.
@@ -78,8 +78,8 @@ lapi:
   env:
     # Registers a bouncer named `traefik` with this key on start (the
     # `BOUNCER_KEY_<name>` convention of the CrowdSec image). The key comes
-    # from 1Password (bouncer-key.yaml) so traefik-public can later read the
-    # same value from its own copy of the item, rather than a key generated
+    # from 1Password (bouncer-key.yaml) so traefik-public reads the same
+    # value from its own copy of the item, rather than a key generated
     # in-cluster and copied across by hand.
     # Registration is skipped if a bouncer named `traefik` already exists,
     # so rotating the key means `cscli bouncers delete traefik` in the lapi
