@@ -1,0 +1,56 @@
+# CrowdSec in detect-only mode: an agent reads traefik-public's access logs
+# and the local API (LAPI) turns what it sees into alerts and decisions.
+# Nothing acts on those decisions yet - enforcement is a bouncer inside
+# traefik-public, added in a separate change.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: crowdsec
+spec:
+  releaseName: crowdsec
+  # The LAPI pod reads the bouncer key from a Secret the 1Password operator
+  # writes, so the operator must be Ready before this release installs.
+  dependsOn:
+    - name: onepassword
+      namespace: onepassword
+  chart:
+    spec:
+      chart: crowdsec
+      sourceRef:
+        kind: HelmRepository
+        name: crowdsec
+        namespace: flux-system
+      version: "0.24.3"
+  interval: 8h0m0s
+  # First start registers with the central API and downloads hub content on
+  # both pods (the agent also waits for the LAPI), so allow more than the 5m
+  # default before Helm gives up.
+  timeout: 10m0s
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
+  valuesFrom:
+    - kind: ConfigMap
+      name: crowdsec-values
+  # The chart does not expose revisionHistoryLimit, so set the repo-wide
+  # value on its two workloads after rendering.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: DaemonSet
+              name: crowdsec-agent
+            patch: |
+              - op: add
+                path: /spec/revisionHistoryLimit
+                value: 2
+          - target:
+              kind: Deployment
+              name: crowdsec-lapi
+            patch: |
+              - op: add
+                path: /spec/revisionHistoryLimit
+                value: 2
