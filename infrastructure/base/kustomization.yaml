@@ -6,6 +6,7 @@ resources:
   - letsencrypt
   - system-upgrade-controller
   - onepassword
+  - crowdsec
   - traefik-public
   - traefik-private
   #- longhorn

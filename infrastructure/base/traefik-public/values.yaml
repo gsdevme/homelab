@@ -97,6 +97,12 @@ ports:
         - traefik-public-compress@kubernetescrd
         - traefik-public-hsts@kubernetescrd
 
+# CrowdSec reads this log to detect scanners: its agent tails this pod's
+# container log and parses the default (CLF) access-log lines, including the
+# 404s for requests that match no router. Turning the log off, filtering
+# status codes out of it, or changing its format or fields stops detection
+# without any error. So does renaming the release, since the agent finds the
+# log by the traefik-public-* pod name (infrastructure/base/crowdsec/values.yaml).
 accessLog:
   enabled: true
 

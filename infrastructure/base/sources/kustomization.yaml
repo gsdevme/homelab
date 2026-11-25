@@ -10,3 +10,4 @@ resources:
   - longhorn.yaml
   - onepassword.yaml
   - traefik.yaml
+  - crowdsec.yaml

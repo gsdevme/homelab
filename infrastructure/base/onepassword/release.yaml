@@ -57,6 +57,10 @@ spec:
         # trade-off: this also lets the operator touch the other Secrets in the
         # namespace (ACME account keys); the alternative is per-namespace Issuers.
         - cert-manager
+        # Holds the API key the CrowdSec local API registers its traefik
+        # bouncer with. Same trade-off: the operator can also touch the
+        # chart's own Secrets there (LAPI shared secret, registration token).
+        - crowdsec
       # Global true means editing any item in the vault can restart unrelated
       # workloads. Opt in per workload with the annotation
       # operator.1password.io/auto-restart: "true".

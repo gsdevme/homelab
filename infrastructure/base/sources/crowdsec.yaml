@@ -1,0 +1,9 @@
+# Official CrowdSec chart repository; serves the crowdsec chart (agent +
+# local API) that reads traefik-public's access logs.
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: crowdsec
+spec:
+  interval: 36h0m0s
+  url: https://crowdsecurity.github.io/helm-charts

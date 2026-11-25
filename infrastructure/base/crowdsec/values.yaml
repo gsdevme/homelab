@@ -1,0 +1,108 @@
+# Values for the crowdsec release (chart crowdsec 0.24.3, CrowdSec v1.8.2).
+# Only non-default values are set; each says why.
+#
+# Detect only: the agent parses traefik-public's access logs and the LAPI
+# records alerts and decisions (`cscli alerts list`, `cscli decisions list`
+# in the lapi pod). Nothing enforces them until the bouncer plugin is added
+# to traefik-public, which is a separate change.
+
+# k3s runs containerd, whose CRI log lines differ from Docker's json-file
+# format; this sets the acquisition label so the right log parser is used.
+container_runtime: containerd
+
+agent:
+  # The agent tails /var/log/containers on its own node, so it only needs to
+  # run where traefik-public runs. traefik-public is a single-pod DaemonSet
+  # pinned to kube-master (the node the home router forwards 80/443 to); an
+  # agent on any other node would have nothing to read.
+  nodeSelector:
+    kubernetes.io/hostname: kube-master
+  # Matches /var/log/containers/traefik-public-*_traefik-public_*.log. Only
+  # the public instance: traefik-private is LAN-only and not a target.
+  acquisition:
+    - namespace: traefik-public
+      podName: traefik-public-*
+      program: traefik
+  env:
+    # Parsers and scenarios for Traefik access logs (HTTP probing, crawlers,
+    # known CVE paths, ...). Installed from the hub on every start.
+    - name: COLLECTIONS
+      value: "crowdsecurity/traefik"
+    # Unwraps the containerd CRI line (timestamp, stream, flag) around each
+    # access-log entry before the Traefik parser sees it. The image normally
+    # installs this itself; named here so parsing does not depend on that.
+    - name: PARSERS
+      value: "crowdsecurity/cri-logs"
+  # Chart default reserves 500m cpu; the agent idles far below that on one
+  # node's worth of access logs. The cpu limit (chart default) leaves room
+  # for the hub download and parser load at startup.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 500m
+      memory: 250Mi
+
+lapi:
+  # SQLite on a ReadWriteOnce volume: more than one replica would need an
+  # external database.
+  replicas: 1
+  # Co-located with the agent and traefik-public. The local-path volumes
+  # below bind to whichever node the pod first lands on, so pinning it also
+  # keeps the data from being stranded on another node.
+  nodeSelector:
+    kubernetes.io/hostname: kube-master
+  # Both volumes stay enabled (chart default) so the database (alerts,
+  # decisions, registered machines and bouncers) and the central API
+  # credentials survive restarts. Named explicitly rather than left to the
+  # cluster default so the claim does not change if the default ever does.
+  # local-path's reclaim policy is Delete: uninstalling the release loses
+  # the history, which is acceptable for this data.
+  # The config volume is seeded once: the chart copies the image's
+  # /etc/crowdsec into it with `cp -n`, which never overwrites. A later
+  # chart or image bump therefore keeps the config files from the first
+  # install. If a bump needs new defaults, delete the crowdsec-config-pvc
+  # claim and let the pod reseed it (the LAPI re-registers with the central
+  # API; alerts and decisions live on the data volume and are kept).
+  persistentVolume:
+    data:
+      storageClassName: local-path
+    config:
+      storageClassName: local-path
+  env:
+    # Registers a bouncer named `traefik` with this key on start (the
+    # `BOUNCER_KEY_<name>` convention of the CrowdSec image). The key comes
+    # from 1Password (bouncer-key.yaml) so traefik-public can later read the
+    # same value from its own copy of the item, rather than a key generated
+    # in-cluster and copied across by hand.
+    # Registration is skipped if a bouncer named `traefik` already exists,
+    # so rotating the key means `cscli bouncers delete traefik` in the lapi
+    # pod and then restarting it.
+    #
+    # The central (online) API stays enabled: the LAPI shares the signals it
+    # raises with CrowdSec and receives the community blocklist in return.
+    # To run fully offline, add DISABLE_ONLINE_API="true" here (the chart
+    # then also drops the online_client config).
+    - name: BOUNCER_KEY_traefik
+      valueFrom:
+        secretKeyRef:
+          name: crowdsec-bouncer-traefik
+          key: key
+  # Chart default requests 500m/500Mi; a single-agent SQLite LAPI idles at
+  # a fraction of that, so the requests are lowered. The limits stay at the
+  # chart defaults: memory peaks when the community blocklist is pulled and
+  # written to SQLite (at startup and every couple of hours), and that peak
+  # has not been measured on this cluster yet.
+  resources:
+    requests:
+      cpu: 50m
+      memory: 150Mi
+    limits:
+      cpu: 500m
+      memory: 500Mi
+
+# Explicit although it is the chart default: the WAF component would be a
+# third workload and needs the Traefik plugin's AppSec mode to be useful.
+appsec:
+  enabled: false
