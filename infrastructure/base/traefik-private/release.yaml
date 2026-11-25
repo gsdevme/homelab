@@ -19,7 +19,7 @@ spec:
         kind: HelmRepository
         name: traefik
         namespace: flux-system
-      version: "42.4.0"
+      version: "42.4.3"
   interval: 8h0m0s
   # A hostPort DaemonSet rollout replaces the pod in place (old pod must exit
   # before the new one can bind the port), so allow more than the 5m default.

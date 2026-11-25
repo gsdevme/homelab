@@ -1,4 +1,4 @@
-# Values for the traefik-public instance (chart traefik 42.4.0).
+# Values for the traefik-public instance (chart traefik 42.4.3).
 # Only non-default values are set; each says why.
 
 deployment:
