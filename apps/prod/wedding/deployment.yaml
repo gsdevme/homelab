@@ -93,6 +93,9 @@ metadata:
   annotations:
     # HTTP-01 issuer; its solver Ingress is also served by traefik-public.
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Security headers; see middleware.yaml. Format is
+    # <namespace>-<middleware name>@kubernetescrd.
+    traefik.ingress.kubernetes.io/router.middlewares: wedding-headers@kubernetescrd
 spec:
   # traefik-public is not the default IngressClass, so without this the
   # Ingress is served by nothing.
