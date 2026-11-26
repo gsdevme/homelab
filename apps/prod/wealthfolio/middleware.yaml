@@ -6,9 +6,9 @@ kind: Middleware
 metadata:
   name: basic-auth
   annotations:
-    # traefik-private's kubernetesCRD provider only loads objects carrying its
-    # class; without this the middleware is invisible and the router that
-    # references it is dropped (the host would 404, not go unauthenticated).
+    # Kept by convention: in Traefik v3.7.20 the kubernetesCRD provider's
+    # class filter applies only to IngressRoutes, so both Traefik instances
+    # load this Middleware whatever its class.
     kubernetes.io/ingress.class: traefik-private
 spec:
   basicAuth:

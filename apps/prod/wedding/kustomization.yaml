@@ -5,3 +5,4 @@ resources:
   - 1-namespace.yaml
   - deployment.yaml
   - hpa.yaml
+  - middleware.yaml

@@ -20,6 +20,16 @@ metadata:
   annotations:
     # HTTP-01 issuer; its solver Ingress is also served by traefik-public.
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    # Per-client rate limit (100 req/s, burst 400), defined in traefik-public
+    # (infrastructure/base/traefik-public/values.yaml, where the numbers are
+    # explained). Format is <namespace>-<middleware name>@kubernetescrd; the
+    # reference crosses namespaces, which the Ingress provider allows while
+    # providers.kubernetesIngress.crossProviderNamespaces is unset (setting
+    # it without this namespace would make Traefik skip this whole Ingress).
+    # This host is not behind Cloudflare, so the peer Traefik keys on is the
+    # real client. If the app or a camera view starts getting 429s, raise
+    # the numbers there rather than removing this.
+    traefik.ingress.kubernetes.io/router.middlewares: traefik-public-rate-limit@kubernetescrd
 spec:
   # traefik-public is not the default IngressClass, so without this the
   # Ingress is served by nothing. Websockets (/api/websocket) need no

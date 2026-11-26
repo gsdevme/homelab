@@ -93,6 +93,51 @@ CrowdSec API is down, traffic flows. List or lift bans with
 `... cscli decisions delete --ip <ip>`. Keep the access-log format and the
 `traefik-public` release name as they are; detection depends on both.
 
+`traefik-public` also limits every request on both entrypoints: headers up to
+64 KiB and no encoded NUL or backslash in the path (400).
+
+Home Assistant and unknown-host requests reach `traefik-public` directly, so the
+connection's address is the client's. The wedding site is proxied by
+Cloudflare, so its visitors arrive from Cloudflare edge addresses that many of
+them share. Per-IP controls therefore cannot tell wedding visitors apart: the
+CrowdSec bouncer cannot ban one of them, CrowdSec never bans a Cloudflare
+address (its CDN whitelist), and stopping scanners on that host is left to
+Cloudflare.
+
+For the same reason the per-client rate limit (`traefik-public-rate-limit`,
+100 requests/s with a burst of 400, then 429) is attached only to the Home
+Assistant Ingress and the catch-all route, not to the entrypoints: on the
+wedding host one noisy client would get everyone behind the same Cloudflare edge
+rate-limited. It is keyed by the connection's address, never by
+`X-Forwarded-For`, and sized for Home Assistant's frontend cold loads and camera
+streams. Each router keeps its own buckets. 429s are access-logged, so watch for
+them on Home Assistant after a change.
+
+Its default TLS options are TLS 1.2 or later with forward-secret AEAD ciphers
+only. A TLS 1.3-only option, `tls13`, exists; a host opts in with the Ingress
+annotation `traefik.ingress.kubernetes.io/router.tls.options:
+traefik-public-tls13@kubernetescrd`. No host uses it yet: an HTTP-01 host can't
+until cert-manager's solver Ingresses carry the same option, because the two
+conflict during every renewal and Traefik then stops serving the host.
+
+Home Assistant gets no body cap or buffering: its backups upload as multi-GB
+bodies, and websockets and long streams (SSE, camera MJPEG) must pass through
+untouched. The wedding site adds security headers
+(`apps/prod/wedding/middleware.yaml`) but deliberately has no Traefik body cap:
+Traefik's buffering middleware also holds up to 1 MiB of every in-flight
+response in memory, a way to run the single 256Mi `traefik-public` pod out of
+memory, and nginx already refuses request bodies over 1 MiB.
+
+Don't add these to `traefik-public`:
+
+- `sniStrict` — unknown-host scans would fail the TLS handshake and never reach
+  the access log, so CrowdSec would stop seeing them.
+- `writeTimeout` — it cuts streams and long downloads mid-response.
+- Entrypoint-wide `inFlightReq` — websockets and streams hold a request open
+  for hours.
+- `buffering`, anywhere — it breaks streaming and large uploads, and holds up
+  to 1 MiB of every in-flight response in the pod's memory.
+
 ### Why hostPorts: servicelb is disabled
 
 The k3s server runs with `--disable traefik,servicelb`. The Traefik above is the

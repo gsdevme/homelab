@@ -1,0 +1,33 @@
+# Middlewares for the wedding site only, attached to its Ingress with the
+# router.middlewares annotation (deployment.yaml). They run after the
+# traefik-public entrypoint middlewares (bouncer, compression, HSTS). This
+# host is proxied by Cloudflare, so the per-client rate limit is
+# deliberately not attached here: every visitor arrives from a shared
+# Cloudflare edge address (see the rate-limit Middleware in
+# infrastructure/base/traefik-public/values.yaml).
+#
+# The class annotation matches traefik-public by convention; Traefik v3.7.20
+# loads Middlewares whatever their class (only IngressRoutes are filtered).
+#
+# Deliberately no Traefik request-body cap (no `buffering` middleware):
+# buffering also holds up to 1 MiB of every in-flight response in the
+# Traefik pod's memory, and a Middleware cannot turn response buffering off in
+# v3.7.20, which on the single 256Mi traefik-public pod that serves every
+# public host is an out-of-memory path. nginx already refuses request bodies
+# over 1 MiB (its client_max_body_size default) with 413.
+
+# Response headers nginx does not set: no MIME sniffing
+# (X-Content-Type-Options: nosniff), no framing by any site
+# (X-Frame-Options: DENY), and only the origin in Referer for cross-site
+# links. HSTS already comes from the entrypoint.
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: headers
+  annotations:
+    kubernetes.io/ingress.class: traefik-public
+spec:
+  headers:
+    contentTypeNosniff: true
+    frameDeny: true
+    referrerPolicy: strict-origin-when-cross-origin
